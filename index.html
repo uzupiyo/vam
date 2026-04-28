@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ヴァンサバ風 2Dアクション試作品</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="game-shell">
+    <div class="top-ui">
+      <div class="bar-box">
+        <div id="hpFill" class="bar-fill"></div>
+        <div id="hpLabel" class="bar-label">HP 100 / 100</div>
+      </div>
+
+      <div class="bar-box">
+        <div id="expFill" class="bar-fill"></div>
+        <div id="expLabel" class="bar-label">EXP 0 / 10</div>
+      </div>
+
+      <div id="levelText" class="status-box">Lv.1</div>
+      <div id="timeText" class="status-box">00:00</div>
+      <div id="killText" class="status-box">KILL 0</div>
+    </div>
+
+    <div class="canvas-wrap">
+      <canvas id="game" width="960" height="540"></canvas>
+
+      <div id="titleOverlay" class="overlay show">
+        <div class="panel">
+          <h1>ヴァンサバ風 2Dアクション</h1>
+          <p>敵から逃げながら経験値を集め、レベルアップで強化を選ぶ試作品です。</p>
+          <p>W/A/S/D または 矢印キーで移動、攻撃は自動、Spaceで一時停止。</p>
+          <div class="button-row">
+            <button id="startButton">ゲーム開始</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="levelOverlay" class="overlay">
+        <div class="panel">
+          <h2>LEVEL UP!</h2>
+          <p>強化を1つ選んでください。</p>
+          <div id="upgradeList" class="upgrade-list"></div>
+        </div>
+      </div>
+
+      <div id="pauseOverlay" class="overlay">
+        <div class="panel">
+          <h2>PAUSE</h2>
+          <p>Spaceキーで再開します。</p>
+        </div>
+      </div>
+
+      <div id="resultOverlay" class="overlay">
+        <div class="panel">
+          <h1 id="resultTitle">GAME OVER</h1>
+          <p id="resultText"></p>
+          <div class="button-row">
+            <button id="retryButton">リトライ</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="help-text">
+      操作：W/A/S/D または 矢印キーで移動 / Spaceで一時停止<br />
+      改造ポイント：敵を増やす場合は ENEMY_TYPES、武器や強化を増やす場合は UPGRADE_POOL と updateAttacks() を編集します。
+    </div>
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>

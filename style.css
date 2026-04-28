@@ -1,0 +1,227 @@
+/*
+  ==============================
+  画面全体のデザイン
+  ==============================
+  画像素材なしで動くように、図形とCSSだけでドット絵風にしています。
+*/
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #111827;
+  color: #f9fafb;
+  font-family: "Courier New", monospace;
+  overflow: hidden;
+}
+
+.game-shell {
+  width: min(100vw, 1100px);
+  padding: 16px;
+}
+
+.top-ui {
+  display: grid;
+  grid-template-columns: 1fr 1fr 120px 140px 140px;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.bar-box {
+  border: 3px solid #374151;
+  background: #030712;
+  height: 24px;
+  position: relative;
+  box-shadow: 0 4px 0 #000;
+}
+
+.bar-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2;
+  font-weight: bold;
+  text-shadow: 2px 2px 0 #000;
+  pointer-events: none;
+}
+
+.bar-fill {
+  height: 100%;
+  width: 100%;
+  transition: width 0.15s linear;
+}
+
+#hpFill {
+  background: linear-gradient(90deg, #ef4444, #f97316);
+}
+
+#expFill {
+  background: linear-gradient(90deg, #3b82f6, #22d3ee);
+}
+
+.status-box {
+  border: 3px solid #374151;
+  background: #030712;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 0 #000;
+  font-weight: bold;
+  text-shadow: 2px 2px 0 #000;
+}
+
+.canvas-wrap {
+  position: relative;
+  border: 4px solid #374151;
+  background: #020617;
+  box-shadow: 0 8px 0 #000;
+  image-rendering: pixelated;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #0f172a;
+  image-rendering: pixelated;
+}
+
+.help-text {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #cbd5e1;
+  line-height: 1.7;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.68);
+  padding: 24px;
+  z-index: 10;
+}
+
+.overlay.show {
+  display: flex;
+}
+
+.panel {
+  width: min(720px, 96%);
+  border: 4px solid #e5e7eb;
+  background: #111827;
+  padding: 24px;
+  box-shadow: 0 8px 0 #000;
+  text-align: center;
+}
+
+.panel h1,
+.panel h2 {
+  margin: 0 0 16px;
+  letter-spacing: 0.05em;
+  text-shadow: 3px 3px 0 #000;
+}
+
+.panel p {
+  margin: 8px 0;
+  color: #d1d5db;
+  line-height: 1.7;
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+button {
+  cursor: pointer;
+  border: 3px solid #e5e7eb;
+  background: #2563eb;
+  color: #fff;
+  padding: 12px 18px;
+  font-family: inherit;
+  font-weight: bold;
+  box-shadow: 0 5px 0 #000;
+  transition: transform 0.08s linear, box-shadow 0.08s linear;
+}
+
+button:hover {
+  transform: translateY(2px);
+  box-shadow: 0 3px 0 #000;
+  background: #1d4ed8;
+}
+
+.upgrade-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.upgrade-card {
+  min-height: 145px;
+  padding: 14px;
+  background: #1f2937;
+  border: 3px solid #6b7280;
+  box-shadow: 0 5px 0 #000;
+  text-align: left;
+  cursor: pointer;
+}
+
+.upgrade-card:hover {
+  border-color: #facc15;
+  background: #273449;
+}
+
+.upgrade-card strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #facc15;
+  font-size: 16px;
+}
+
+.upgrade-card span {
+  display: block;
+  color: #d1d5db;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+@media (max-width: 760px) {
+  body {
+    align-items: flex-start;
+  }
+
+  .game-shell {
+    padding: 8px;
+  }
+
+  .top-ui {
+    grid-template-columns: 1fr 1fr;
+    font-size: 12px;
+  }
+
+  .status-box {
+    height: 28px;
+  }
+
+  .upgrade-list {
+    grid-template-columns: 1fr;
+  }
+}
