@@ -45,7 +45,7 @@ const retryButton = document.getElementById("retryButton");
 // ------------------------------
 // ゲーム調整値
 // ------------------------------
-const CLEAR_TIME = 60; // 10分 = 600秒。テスト時は 60 などに短くすると確認しやすいです。
+const CLEAR_TIME = 300; // 10分 = 600秒。テスト時は 60 などに短くすると確認しやすいです。
 const PLAYER_RADIUS = 13;
 const GEM_RADIUS = 6;
 
