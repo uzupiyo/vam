@@ -1,0 +1,25 @@
+{
+  "project": "RIN SURVIVORS",
+  "version": "ui_assets_integrated",
+  "assets": {
+    "player": "assets/player/rin/idle/frame_01.png ... frame_04.png",
+    "enemies": {
+      "slime": "assets/enemies/slime/frame_01.png ... frame_02.png",
+      "bat": "assets/enemies/bat/frame_01.png ... frame_02.png",
+      "golem": "assets/enemies/golem/frame_01.png ... frame_02.png",
+      "boss": "assets/enemies/boss/frame_01.png ... frame_02.png"
+    },
+    "items": [
+      "assets/items/magnet.png",
+      "assets/items/heal_cross.png",
+      "assets/items/barrier_shield.png",
+      "assets/items/rin_dual_pistols.png"
+    ],
+    "background": "assets/backgrounds/rin_city_plaza_field.png"
+  },
+  "notes": [
+    "Sprites are centered in their source files as much as possible.",
+    "Shadows are drawn by Canvas, not baked into sprites.",
+    "Adjust SPRITE_SIZES in game.js for final gameplay balance."
+  ]
+}

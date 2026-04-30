@@ -579,3 +579,18 @@ canvas {
     grid-template-columns: 1fr;
   }
 }
+
+
+.asset-status {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  z-index: 6;
+  padding: 6px 10px;
+  background: rgba(5, 13, 28, 0.75);
+  border: 1px solid rgba(143, 241, 255, 0.65);
+  border-radius: 8px;
+  color: #8ff1ff;
+  font-size: 11px;
+  pointer-events: none;
+}

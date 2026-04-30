@@ -22,6 +22,98 @@ const W = canvas.width;
 const H = canvas.height;
 
 // ------------------------------
+// 画像アセット
+// ------------------------------
+const ASSET_PATHS = {
+  background: "assets/backgrounds/rin_city_plaza_field.png",
+  player: {
+    idle: [
+      "assets/player/rin/idle/frame_01.png",
+      "assets/player/rin/idle/frame_02.png",
+      "assets/player/rin/idle/frame_03.png",
+      "assets/player/rin/idle/frame_04.png",
+    ],
+  },
+  enemies: {
+    slime: ["assets/enemies/slime/frame_01.png", "assets/enemies/slime/frame_02.png"],
+    bat: ["assets/enemies/bat/frame_01.png", "assets/enemies/bat/frame_02.png"],
+    golem: ["assets/enemies/golem/frame_01.png", "assets/enemies/golem/frame_02.png"],
+    boss: ["assets/enemies/boss/frame_01.png", "assets/enemies/boss/frame_02.png"],
+  },
+  items: {
+    magnet: "assets/items/magnet.png",
+    heal: "assets/items/heal_cross.png",
+    barrier: "assets/items/barrier_shield.png",
+    weapon: "assets/items/rin_dual_pistols.png",
+  },
+};
+
+const images = {};
+let assetsLoaded = false;
+let assetsExpected = 0;
+let assetsCompleted = 0;
+
+function updateAssetStatus() {
+  if (!assetStatus) return;
+  assetStatus.textContent = assetsLoaded
+    ? `ASSETS OK ${assetsCompleted}/${assetsExpected}`
+    : `ASSETS LOADING ${assetsCompleted}/${assetsExpected}`;
+}
+
+function loadImage(src) {
+  assetsExpected += 1;
+  const img = new Image();
+  img.onload = () => {
+    assetsCompleted += 1;
+    assetsLoaded = assetsCompleted >= assetsExpected;
+    updateAssetStatus();
+  };
+  img.onerror = () => {
+    assetsCompleted += 1;
+    console.warn("Asset failed:", src);
+    assetsLoaded = assetsCompleted >= assetsExpected;
+    updateAssetStatus();
+  };
+  img.src = src;
+  return img;
+}
+
+function preloadAssets() {
+  images.background = loadImage(ASSET_PATHS.background);
+  images.player = {
+    idle: ASSET_PATHS.player.idle.map(loadImage),
+  };
+  images.enemies = {};
+  for (const [key, paths] of Object.entries(ASSET_PATHS.enemies)) {
+    images.enemies[key] = paths.map(loadImage);
+  }
+  images.items = {};
+  for (const [key, path] of Object.entries(ASSET_PATHS.items)) {
+    images.items[key] = loadImage(path);
+  }
+  updateAssetStatus();
+}
+
+preloadAssets();
+
+const SPRITE_SIZES = {
+  player: { w: 64, h: 86 },
+  enemies: {
+    slime: { w: 54, h: 42 },
+    bat: { w: 66, h: 54 },
+    golem: { w: 108, h: 108 },
+    boss: { w: 172, h: 172 },
+  },
+  items: {
+    magnet: { w: 42, h: 42 },
+    heal: { w: 42, h: 42 },
+    barrier: { w: 46, h: 46 },
+    weapon: { w: 48, h: 48 },
+  },
+};
+
+
+// ------------------------------
 // UI要素
 // ------------------------------
 const hpFill = document.getElementById("hpFill");
@@ -59,6 +151,7 @@ const upgradeList = document.getElementById("upgradeList");
 
 const startButton = document.getElementById("startButton");
 const retryButton = document.getElementById("retryButton");
+const assetStatus = document.getElementById("assetStatus");
 
 // ------------------------------
 // ゲーム調整値
@@ -936,57 +1029,18 @@ function draw() {
 }
 
 function drawBackground() {
-  const tile = 32;
+  const bg = images.background;
+  if (bg && bg.complete && bg.naturalWidth > 0) {
+    ctx.drawImage(bg, 0, 0, W, H);
+    ctx.fillStyle = "rgba(4, 10, 24, 0.08)";
+    ctx.fillRect(0, 0, W, H);
+    return;
+  }
 
-  // Modern plaza base
   ctx.fillStyle = "#172033";
   ctx.fillRect(0, 0, W, H);
-
   ctx.fillStyle = "#c9bda7";
   ctx.fillRect(100, 60, W - 200, H - 120);
-
-  ctx.fillStyle = "#98d15d";
-  ctx.fillRect(0, 0, 150, H);
-  ctx.fillRect(W - 150, 0, 150, H);
-  ctx.fillRect(0, 0, W, 65);
-  ctx.fillRect(0, H - 65, W, 65);
-
-  // Pavement tiles
-  ctx.strokeStyle = "rgba(77, 88, 104, 0.28)";
-  ctx.lineWidth = 1;
-  for (let x = 100; x <= W - 100; x += tile) {
-    ctx.beginPath();
-    ctx.moveTo(x, 60);
-    ctx.lineTo(x, H - 60);
-    ctx.stroke();
-  }
-  for (let y = 60; y <= H - 60; y += tile) {
-    ctx.beginPath();
-    ctx.moveTo(100, y);
-    ctx.lineTo(W - 100, y);
-    ctx.stroke();
-  }
-
-  // Decorative lawns and walk borders
-  ctx.strokeStyle = "rgba(245, 245, 245, 0.45)";
-  ctx.lineWidth = 4;
-  ctx.strokeRect(100, 60, W - 200, H - 120);
-
-  // Trees / bushes as simple pixel-friendly shapes
-  drawTree(62, 116);
-  drawTree(W - 72, 120);
-  drawTree(70, H - 118);
-  drawTree(W - 76, H - 112);
-
-  // Benches
-  drawBench(36, H - 42);
-  drawBench(W - 148, 32);
-
-  // Center marker
-  ctx.strokeStyle = "rgba(255,255,255,0.2)";
-  ctx.beginPath();
-  ctx.arc(W / 2, H / 2, 52, 0, Math.PI * 2);
-  ctx.stroke();
 }
 
 function drawTree(x, y) {
@@ -1006,51 +1060,95 @@ function drawBench(x, y) {
   ctx.fillRect(x + 4, y + 10, 70, 8);
 }
 
+
+function getAnimationFrame(frameList, fps = 4) {
+  if (!frameList || frameList.length === 0) return null;
+  const index = Math.floor(game.elapsed * fps) % frameList.length;
+  const img = frameList[index];
+  return img && img.complete && img.naturalWidth > 0 ? img : null;
+}
+
+function drawSpriteBottomCenter(img, x, bottomY, w, h) {
+  if (!img || !img.complete || img.naturalWidth <= 0) return false;
+  ctx.drawImage(img, x - w / 2, bottomY - h, w, h);
+  return true;
+}
+
+function drawSpriteCenter(img, x, y, w, h) {
+  if (!img || !img.complete || img.naturalWidth <= 0) return false;
+  ctx.drawImage(img, x - w / 2, y - h / 2, w, h);
+  return true;
+}
+
+function drawShadow(x, y, w, h, alpha = 0.28) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = "#000000";
+  ctx.beginPath();
+  ctx.ellipse(x, y, w / 2, h / 2, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
 function drawPlayer() {
   const p = game.player;
   const blink = p.invincibleTime > 0 && Math.floor(performance.now() / 80) % 2 === 0;
+
   if (p.barrierTime > 0) {
     ctx.globalAlpha = 0.35 + Math.sin(performance.now() / 120) * 0.12;
     ctx.strokeStyle = "#a855f7";
     ctx.lineWidth = 5;
     ctx.beginPath();
-    ctx.arc(p.x, p.y, 31, 0, Math.PI * 2);
+    ctx.arc(p.x, p.y, 38, 0, Math.PI * 2);
     ctx.stroke();
     ctx.globalAlpha = 1;
   }
   if (blink) return;
 
-  ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
-  ctx.fillRect(p.x - 13, p.y + 12, 26, 8);
+  const size = SPRITE_SIZES.player;
+  const bottomY = p.y + size.h * 0.44;
+  drawShadow(p.x, bottomY - 4, size.w * 0.64, size.h * 0.18, 0.3);
 
+  const frame = getAnimationFrame(images.player.idle, 4);
+  if (drawSpriteBottomCenter(frame, p.x, bottomY, size.w, size.h)) return;
+
+  // fallback
   ctx.fillStyle = "#38bdf8";
   ctx.fillRect(p.x - 10, p.y - 12, 20, 24);
-
-  ctx.fillStyle = "#e0f2fe";
-  ctx.fillRect(p.x - 5, p.y - 18, 10, 8);
-
-  ctx.fillStyle = "#0f172a";
-  ctx.fillRect(p.x - 5, p.y - 5, 4, 4);
-  ctx.fillRect(p.x + 2, p.y - 5, 4, 4);
 }
 
 function drawEnemies() {
   for (const e of game.enemies) {
-    ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
-    ctx.fillRect(e.x - e.radius, e.y + e.radius - 4, e.radius * 2, 8);
+    const size = SPRITE_SIZES.enemies[e.typeKey] || { w: e.radius * 3, h: e.radius * 3 };
+    const bottomY = e.y + size.h * 0.42;
 
-    ctx.fillStyle = e.hitFlash > 0 ? "#ffffff" : e.color;
-    ctx.fillRect(e.x - e.radius, e.y - e.radius, e.radius * 2, e.radius * 2);
+    const shadowAlpha = e.typeKey === "bat" ? 0.16 : e.typeKey === "boss" ? 0.34 : 0.28;
+    drawShadow(e.x, bottomY - 4, size.w * 0.62, size.h * 0.17, shadowAlpha);
 
-    ctx.fillStyle = "#020617";
-    ctx.fillRect(e.x - e.radius * 0.45, e.y - e.radius * 0.2, 4, 4);
-    ctx.fillRect(e.x + e.radius * 0.2, e.y - e.radius * 0.2, 4, 4);
+    const frames = images.enemies[e.typeKey];
+    const frame = getAnimationFrame(frames, e.typeKey === "bat" ? 6 : 3);
+    if (e.hitFlash > 0) {
+      ctx.save();
+      ctx.globalAlpha = 0.55;
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.arc(e.x, e.y, Math.max(size.w, size.h) * 0.28, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    const drew = drawSpriteBottomCenter(frame, e.x, bottomY, size.w, size.h);
+    if (!drew) {
+      ctx.fillStyle = e.hitFlash > 0 ? "#ffffff" : e.color;
+      ctx.fillRect(e.x - e.radius, e.y - e.radius, e.radius * 2, e.radius * 2);
+    }
 
     const hpRate = clamp(e.hp / e.maxHp, 0, 1);
-    ctx.fillStyle = "#111827";
-    ctx.fillRect(e.x - e.radius, e.y - e.radius - 8, e.radius * 2, 4);
+    const hpW = Math.max(24, size.w * 0.52);
+    ctx.fillStyle = "rgba(17, 24, 39, 0.82)";
+    ctx.fillRect(e.x - hpW / 2, e.y - size.h * 0.48 - 10, hpW, 4);
     ctx.fillStyle = "#ef4444";
-    ctx.fillRect(e.x - e.radius, e.y - e.radius - 8, e.radius * 2 * hpRate, 4);
+    ctx.fillRect(e.x - hpW / 2, e.y - size.h * 0.48 - 10, hpW * hpRate, 4);
   }
 }
 
@@ -1078,21 +1176,52 @@ function drawGems() {
 
 function drawItems() {
   for (const item of game.items) {
-    const type = ITEM_TYPES[item.typeKey];
     const bobY = Math.sin(item.bob) * 3;
+    const img = images.items[item.typeKey];
+    const size = SPRITE_SIZES.items[item.typeKey] || { w: 34, h: 34 };
+
     ctx.save();
     ctx.translate(item.x, item.y + bobY);
-    ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
-    ctx.fillRect(-10, 12, 20, 5);
-    if (item.typeKey === "magnet") drawMagnetItem(type.color);
-    else if (item.typeKey === "heal") drawHealItem(type.color);
-    else if (item.typeKey === "barrier") drawBarrierItem(type.color);
+    drawShadow(0, size.h * 0.34, size.w * 0.52, size.h * 0.16, 0.2);
+    if (!drawSpriteCenter(img, 0, 0, size.w, size.h)) {
+      const type = ITEM_TYPES[item.typeKey];
+      if (item.typeKey === "magnet") drawMagnetItem(type.color);
+      else if (item.typeKey === "heal") drawHealItem(type.color);
+      else if (item.typeKey === "barrier") drawBarrierItem(type.color);
+    }
     ctx.restore();
   }
 }
-function drawMagnetItem(color) { ctx.fillStyle = "#0f172a"; ctx.fillRect(-12, -12, 24, 24); ctx.fillStyle = color; ctx.fillRect(-10, -10, 7, 18); ctx.fillRect(3, -10, 7, 18); ctx.fillRect(-10, 5, 20, 5); ctx.fillStyle = "#e0f2fe"; ctx.fillRect(-10, -10, 7, 4); ctx.fillRect(3, -10, 7, 4); }
-function drawHealItem(color) { ctx.fillStyle = "#f8fafc"; ctx.fillRect(-12, -12, 24, 24); ctx.strokeStyle = "#7f1d1d"; ctx.strokeRect(-12, -12, 24, 24); ctx.fillStyle = color; ctx.fillRect(-4, -9, 8, 18); ctx.fillRect(-9, -4, 18, 8); }
-function drawBarrierItem(color) { ctx.fillStyle = "#0f172a"; ctx.beginPath(); ctx.moveTo(0, -14); ctx.lineTo(12, -8); ctx.lineTo(9, 8); ctx.lineTo(0, 15); ctx.lineTo(-9, 8); ctx.lineTo(-12, -8); ctx.closePath(); ctx.fill(); ctx.fillStyle = color; ctx.beginPath(); ctx.moveTo(0, -11); ctx.lineTo(9, -6); ctx.lineTo(7, 7); ctx.lineTo(0, 12); ctx.lineTo(-7, 7); ctx.lineTo(-9, -6); ctx.closePath(); ctx.fill(); ctx.fillStyle = "#f5d0fe"; ctx.fillRect(-2, -7, 4, 13); }
+
+function drawMagnetItem(color) {
+  ctx.fillStyle = "#0f172a";
+  ctx.fillRect(-12, -12, 24, 24);
+  ctx.fillStyle = color;
+  ctx.fillRect(-10, -10, 7, 18);
+  ctx.fillRect(3, -10, 7, 18);
+  ctx.fillRect(-10, 5, 20, 5);
+}
+
+function drawHealItem(color) {
+  ctx.fillStyle = "#f8fafc";
+  ctx.fillRect(-12, -12, 24, 24);
+  ctx.fillStyle = color;
+  ctx.fillRect(-4, -9, 8, 18);
+  ctx.fillRect(-9, -4, 18, 8);
+}
+
+function drawBarrierItem(color) {
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(0, -14);
+  ctx.lineTo(12, -8);
+  ctx.lineTo(9, 8);
+  ctx.lineTo(0, 15);
+  ctx.lineTo(-9, 8);
+  ctx.lineTo(-12, -8);
+  ctx.closePath();
+  ctx.fill();
+}
 
 function drawEffects() {
   for (const ef of game.effects) {
@@ -1139,20 +1268,16 @@ function drawEffects() {
 }
 
 function drawWeaponInfo() {
-  const p = game.player;
-
-  ctx.fillStyle = "rgba(2, 6, 23, 0.72)";
-  ctx.fillRect(12, H - 102, 300, 82);
-
-  ctx.strokeStyle = "#334155";
-  ctx.strokeRect(12, H - 102, 300, 82);
-
-  ctx.fillStyle = "#e5e7eb";
-  ctx.font = "14px Courier New";
-  ctx.fillText(`Knife Lv.${p.knifeLevel}`, 24, H - 72);
-  ctx.fillText(`Fire Lv.${p.fireLevel}`, 124, H - 72);
-  ctx.fillText(`Lightning Lv.${p.lightningLevel}`, 24, H - 50);
-  ctx.fillText(`Items: Magnet / Heal / Barrier`, 24, H - 28);
+  // Small canvas-side sprite preview to confirm item assets are active.
+  const weapon = images.items.weapon;
+  if (weapon && weapon.complete && weapon.naturalWidth > 0) {
+    ctx.save();
+    ctx.globalAlpha = 0.9;
+    ctx.fillStyle = "rgba(2, 6, 23, 0.55)";
+    ctx.fillRect(14, H - 58, 54, 44);
+    drawSpriteCenter(weapon, 42, H - 36, 38, 38);
+    ctx.restore();
+  }
 }
 
 function drawMessage() {
