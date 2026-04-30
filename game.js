@@ -32,6 +32,22 @@ const levelText = document.getElementById("levelText");
 const timeText = document.getElementById("timeText");
 const killText = document.getElementById("killText");
 const barrierText = document.getElementById("barrierText");
+const expFillMini = document.getElementById("expFillMini");
+const goldText = document.getElementById("goldText");
+const pauseButton = document.getElementById("pauseButton");
+const missionTime = document.getElementById("missionTime");
+const missionTimeFill = document.getElementById("missionTimeFill");
+const missionExp = document.getElementById("missionExp");
+const missionExpFill = document.getElementById("missionExpFill");
+const missionBoss = document.getElementById("missionBoss");
+const missionBossFill = document.getElementById("missionBossFill");
+const statAttack = document.getElementById("statAttack");
+const statBarrier = document.getElementById("statBarrier");
+const statSpeed = document.getElementById("statSpeed");
+const statLuck = document.getElementById("statLuck");
+const slotKnife = document.getElementById("slotKnife");
+const slotFire = document.getElementById("slotFire");
+const slotLightning = document.getElementById("slotLightning");
 
 const titleOverlay = document.getElementById("titleOverlay");
 const levelOverlay = document.getElementById("levelOverlay");
@@ -153,6 +169,7 @@ function createInitialGame() {
     spawnTimer: 0,
     bossSpawned: false,
     kills: 0,
+    gold: 0,
     cameraShake: 0,
     message: "",
     messageTimer: 0,
@@ -273,6 +290,7 @@ function startGame() {
 
 startButton.addEventListener("click", startGame);
 retryButton.addEventListener("click", startGame);
+if (pauseButton) pauseButton.addEventListener("click", togglePause);
 
 // ------------------------------
 // 一時停止
@@ -610,6 +628,7 @@ function removeDeadEnemies() {
     const e = game.enemies[i];
     if (e.hp <= 0) {
       game.kills += e.score;
+      game.gold += e.score * 3;
       dropGem(e.x, e.y, e.exp);
       tryDropItem(e.x, e.y, e.typeKey);
       game.effects.push({
@@ -856,15 +875,36 @@ function updateUI() {
 
   const hpRate = clamp(p.hp / p.maxHp, 0, 1) * 100;
   const expRate = clamp(p.exp / p.nextExp, 0, 1) * 100;
+  const timeRate = clamp(game.elapsed / CLEAR_TIME, 0, 1) * 100;
+  const bossRate = game.bossSpawned ? 100 : 0;
 
   hpFill.style.width = `${hpRate}%`;
   expFill.style.width = `${expRate}%`;
+  if (expFillMini) expFillMini.style.width = `${expRate}%`;
+
   hpLabel.textContent = `HP ${Math.ceil(p.hp)} / ${p.maxHp}`;
   expLabel.textContent = `EXP ${Math.floor(p.exp)} / ${p.nextExp}`;
   levelText.textContent = `Lv.${p.level}`;
   timeText.textContent = formatTime(game.elapsed);
   killText.textContent = `KILL ${game.kills}`;
+  if (goldText) goldText.textContent = `GOLD ${game.gold || 0}`;
   if (barrierText) barrierText.textContent = p.barrierTime > 0 ? `BARRIER ${p.barrierTime.toFixed(1)}` : "BARRIER -";
+
+  if (missionTime) missionTime.textContent = `${formatTime(game.elapsed)} / 10:00`;
+  if (missionTimeFill) missionTimeFill.style.width = `${timeRate}%`;
+  if (missionExp) missionExp.textContent = `${Math.floor(p.exp)} / ${p.nextExp}`;
+  if (missionExpFill) missionExpFill.style.width = `${expRate}%`;
+  if (missionBoss) missionBoss.textContent = `${game.bossSpawned ? 1 : 0} / 1`;
+  if (missionBossFill) missionBossFill.style.width = `${bossRate}%`;
+
+  if (statAttack) statAttack.textContent = p.knifeLevel;
+  if (statBarrier) statBarrier.textContent = Math.floor(p.barrierBonus);
+  if (statSpeed) statSpeed.textContent = (p.speed / 190).toFixed(2);
+  if (statLuck) statLuck.textContent = `${Math.min(99, Math.floor((p.pickupRange - 42) / 2))}%`;
+
+  if (slotKnife) slotKnife.textContent = `Lv.${p.knifeLevel} ${"★".repeat(Math.min(5, p.knifeLevel))}`;
+  if (slotFire) slotFire.textContent = `Lv.${p.fireLevel} ${p.fireLevel > 0 ? "★".repeat(Math.min(5, p.fireLevel)) : "☆"}`;
+  if (slotLightning) slotLightning.textContent = `Lv.${p.lightningLevel} ${p.lightningLevel > 0 ? "★".repeat(Math.min(5, p.lightningLevel)) : "☆"}`;
 }
 
 // ------------------------------
@@ -896,26 +936,74 @@ function draw() {
 }
 
 function drawBackground() {
-  ctx.fillStyle = "#0f172a";
+  const tile = 32;
+
+  // Modern plaza base
+  ctx.fillStyle = "#172033";
   ctx.fillRect(0, 0, W, H);
 
-  ctx.strokeStyle = "rgba(148, 163, 184, 0.08)";
+  ctx.fillStyle = "#c9bda7";
+  ctx.fillRect(100, 60, W - 200, H - 120);
+
+  ctx.fillStyle = "#98d15d";
+  ctx.fillRect(0, 0, 150, H);
+  ctx.fillRect(W - 150, 0, 150, H);
+  ctx.fillRect(0, 0, W, 65);
+  ctx.fillRect(0, H - 65, W, 65);
+
+  // Pavement tiles
+  ctx.strokeStyle = "rgba(77, 88, 104, 0.28)";
   ctx.lineWidth = 1;
-  const grid = 32;
-
-  for (let x = 0; x <= W; x += grid) {
+  for (let x = 100; x <= W - 100; x += tile) {
     ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, H);
+    ctx.moveTo(x, 60);
+    ctx.lineTo(x, H - 60);
+    ctx.stroke();
+  }
+  for (let y = 60; y <= H - 60; y += tile) {
+    ctx.beginPath();
+    ctx.moveTo(100, y);
+    ctx.lineTo(W - 100, y);
     ctx.stroke();
   }
 
-  for (let y = 0; y <= H; y += grid) {
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(W, y);
-    ctx.stroke();
-  }
+  // Decorative lawns and walk borders
+  ctx.strokeStyle = "rgba(245, 245, 245, 0.45)";
+  ctx.lineWidth = 4;
+  ctx.strokeRect(100, 60, W - 200, H - 120);
+
+  // Trees / bushes as simple pixel-friendly shapes
+  drawTree(62, 116);
+  drawTree(W - 72, 120);
+  drawTree(70, H - 118);
+  drawTree(W - 76, H - 112);
+
+  // Benches
+  drawBench(36, H - 42);
+  drawBench(W - 148, 32);
+
+  // Center marker
+  ctx.strokeStyle = "rgba(255,255,255,0.2)";
+  ctx.beginPath();
+  ctx.arc(W / 2, H / 2, 52, 0, Math.PI * 2);
+  ctx.stroke();
+}
+
+function drawTree(x, y) {
+  ctx.fillStyle = "#5b361d";
+  ctx.fillRect(x - 5, y + 20, 10, 22);
+  ctx.fillStyle = "#2f7d32";
+  ctx.fillRect(x - 22, y - 8, 44, 34);
+  ctx.fillStyle = "#62b83e";
+  ctx.fillRect(x - 15, y - 18, 30, 18);
+}
+
+function drawBench(x, y) {
+  ctx.fillStyle = "#2b1d16";
+  ctx.fillRect(x, y + 12, 78, 6);
+  ctx.fillStyle = "#9f5a2e";
+  ctx.fillRect(x + 4, y, 70, 8);
+  ctx.fillRect(x + 4, y + 10, 70, 8);
 }
 
 function drawPlayer() {

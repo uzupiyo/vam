@@ -3,72 +3,174 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ヴァンサバ風 2Dアクション試作品</title>
+  <title>RIN SURVIVORS - Prototype</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <main class="game-shell">
-    <div class="top-ui">
-      <div class="bar-box">
-        <div id="hpFill" class="bar-fill"></div>
-        <div id="hpLabel" class="bar-label">HP 100 / 100</div>
-      </div>
+    <div class="hud-layer">
+      <section class="player-panel ui-panel">
+        <div class="portrait-frame">
+          <div class="portrait-placeholder">Rin</div>
+        </div>
+        <div class="player-info">
+          <div class="player-row">
+            <span class="player-name">Rin</span>
+            <span id="levelText" class="level-chip">Lv.1</span>
+          </div>
 
-      <div class="bar-box">
-        <div id="expFill" class="bar-fill"></div>
-        <div id="expLabel" class="bar-label">EXP 0 / 10</div>
-      </div>
+          <div class="bar-box hp-box">
+            <div id="hpFill" class="bar-fill"></div>
+            <div id="hpLabel" class="bar-label">HP 100 / 100</div>
+          </div>
 
-      <div id="levelText" class="status-box">Lv.1</div>
-      <div id="timeText" class="status-box">00:00</div>
-      <div id="killText" class="status-box">KILL 0</div>
-      <div id="barrierText" class="status-box">BARRIER -</div>
+          <div class="bar-box exp-mini-box">
+            <div id="expFillMini" class="bar-fill"></div>
+            <div class="bar-label mini-label">NEXT EXP</div>
+          </div>
+
+          <div class="stat-row">
+            <span>🔫 <b id="statAttack">1</b></span>
+            <span>🛡 <b id="statBarrier">0</b></span>
+            <span>⚡ <b id="statSpeed">1.00</b></span>
+            <span>🍀 <b id="statLuck">0%</b></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="timer-panel ui-panel">
+        <div id="timeText" class="timer-text">00:00</div>
+        <div class="stage-label">Rin City Plaza</div>
+      </section>
+
+      <section class="top-right-panel">
+        <div id="killText" class="status-box ui-panel">KILL 0</div>
+        <div id="goldText" class="status-box ui-panel">GOLD 0</div>
+        <button id="pauseButton" class="icon-button ui-panel" type="button">Ⅱ</button>
+      </section>
     </div>
 
     <div class="canvas-wrap">
       <canvas id="game" width="960" height="540"></canvas>
 
-      <div id="titleOverlay" class="overlay show">
-        <div class="panel">
-          <h1>ヴァンサバ風 2Dアクション</h1>
-          <p>敵から逃げながら経験値を集め、レベルアップで強化を選ぶ試作品です。</p>
-          <p>W/A/S/D または 矢印キーで移動、攻撃は自動、Spaceで一時停止。</p>
-          <div class="button-row">
-            <button id="startButton">ゲーム開始</button>
+      <aside class="mission-panel ui-panel">
+        <h3>MISSIONS</h3>
+        <div class="mission-row">
+          <span>⏱ Survive 10:00</span>
+          <small id="missionTime">0:00 / 10:00</small>
+        </div>
+        <div class="mission-progress"><span id="missionTimeFill"></span></div>
+
+        <div class="mission-row">
+          <span>💎 Collect EXP</span>
+          <small id="missionExp">0 / 10</small>
+        </div>
+        <div class="mission-progress"><span id="missionExpFill"></span></div>
+
+        <div class="mission-row">
+          <span>👿 Defeat Boss</span>
+          <small id="missionBoss">0 / 1</small>
+        </div>
+        <div class="mission-progress"><span id="missionBossFill"></span></div>
+      </aside>
+
+      <div id="titleOverlay" class="overlay show title-overlay">
+        <div class="title-screen">
+          <div class="title-logo">
+            <span class="title-rin">RIN</span>
+            <span class="title-survivors">SURVIVORS</span>
+            <small>Modern Pixel Survival Action</small>
           </div>
+
+          <div class="title-visual">
+            <div class="rin-key-card">
+              <div class="rin-key-face">Rin</div>
+              <p>Dual Pistols Ready</p>
+            </div>
+          </div>
+
+          <nav class="title-menu">
+            <button id="startButton" class="menu-button primary" type="button">
+              <span>▶</span> Start Game
+            </button>
+            <button class="menu-button" type="button">
+              <span>⚙</span> Options
+            </button>
+            <button class="menu-button" type="button">
+              <span>♥</span> Collection
+            </button>
+            <button class="menu-button" type="button">
+              <span>↩</span> Exit
+            </button>
+          </nav>
+
+          <div class="press-start">» ♥ Press Start ♥ «</div>
+          <div class="version-label">ver. prototype</div>
         </div>
       </div>
 
-      <div id="levelOverlay" class="overlay">
-        <div class="panel">
+      <div id="levelOverlay" class="overlay level-overlay">
+        <div class="panel level-panel ui-panel">
           <h2>LEVEL UP!</h2>
-          <p>強化を1つ選んでください。</p>
+          <p>Choose your reward!</p>
           <div id="upgradeList" class="upgrade-list"></div>
         </div>
       </div>
 
       <div id="pauseOverlay" class="overlay">
-        <div class="panel">
+        <div class="panel ui-panel">
           <h2>PAUSE</h2>
-          <p>Spaceキーで再開します。</p>
+          <p>Space または 右上ボタンで再開します。</p>
         </div>
       </div>
 
       <div id="resultOverlay" class="overlay">
-        <div class="panel">
+        <div class="panel ui-panel">
           <h1 id="resultTitle">GAME OVER</h1>
           <p id="resultText"></p>
           <div class="button-row">
-            <button id="retryButton">リトライ</button>
+            <button id="retryButton" class="menu-button primary" type="button">Retry</button>
           </div>
         </div>
       </div>
     </div>
 
+    <section class="bottom-hud ui-panel">
+      <div class="exp-box">
+        <span>♥ EXP</span>
+        <div class="bar-box exp-box-main">
+          <div id="expFill" class="bar-fill"></div>
+          <div id="expLabel" class="bar-label">EXP 0 / 10</div>
+        </div>
+      </div>
+
+      <div class="slot-row">
+        <div class="skill-slot active">
+          <span class="slot-num">1</span>
+          <strong>Dual Pistols</strong>
+          <small id="slotKnife">Lv.1 ★</small>
+        </div>
+        <div class="skill-slot">
+          <span class="slot-num">2</span>
+          <strong>Fire Aura</strong>
+          <small id="slotFire">Lv.0 ☆</small>
+        </div>
+        <div class="skill-slot">
+          <span class="slot-num">3</span>
+          <strong>Lightning</strong>
+          <small id="slotLightning">Lv.0 ☆</small>
+        </div>
+        <div class="skill-slot">
+          <span class="slot-num">4</span>
+          <strong>Barrier</strong>
+          <small id="barrierText">BARRIER -</small>
+        </div>
+      </div>
+    </section>
+
     <div class="help-text">
       操作：W/A/S/D または 矢印キーで移動 / Spaceで一時停止<br />
-      追加アイテム：青い磁石 = 経験値全吸収 / 赤い十字 = HP回復 / 紫の盾 = 一定時間バリア<br />
-      改造ポイント：敵は ENEMY_TYPES、武器や強化は UPGRADE_POOL、アイテムは ITEM_TYPES を編集します。
+      追加アイテム：青い磁石 = 経験値全吸収 / 赤い十字 = HP回復 / 紫の盾 = 一定時間バリア
     </div>
   </main>
 
