@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ヴァンサバライク試作品</title>
+  <title>ヴァンサバ風 2Dアクション試作品</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -22,6 +22,7 @@
       <div id="levelText" class="status-box">Lv.1</div>
       <div id="timeText" class="status-box">00:00</div>
       <div id="killText" class="status-box">KILL 0</div>
+      <div id="barrierText" class="status-box">BARRIER -</div>
     </div>
 
     <div class="canvas-wrap">
@@ -66,7 +67,8 @@
 
     <div class="help-text">
       操作：W/A/S/D または 矢印キーで移動 / Spaceで一時停止<br />
-      改造ポイント：敵を増やす場合は ENEMY_TYPES、武器や強化を増やす場合は UPGRADE_POOL と updateAttacks() を編集します。
+      追加アイテム：青い磁石 = 経験値全吸収 / 赤い十字 = HP回復 / 紫の盾 = 一定時間バリア<br />
+      改造ポイント：敵は ENEMY_TYPES、武器や強化は UPGRADE_POOL、アイテムは ITEM_TYPES を編集します。
     </div>
   </main>
 
