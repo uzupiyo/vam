@@ -22,13 +22,13 @@ body {
 }
 
 .game-shell {
-  width: min(100vw, 1100px);
+  width: min(100vw, 1180px);
   padding: 16px;
 }
 
 .top-ui {
   display: grid;
-  grid-template-columns: 1fr 1fr 120px 140px 140px;
+  grid-template-columns: 1fr 1fr 100px 120px 120px 140px;
   gap: 10px;
   align-items: center;
   margin-bottom: 10px;
@@ -203,7 +203,7 @@ button:hover {
   line-height: 1.6;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
   body {
     align-items: flex-start;
   }
