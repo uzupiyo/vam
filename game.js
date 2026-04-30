@@ -16,6 +16,7 @@
 // ------------------------------
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
+ctx.imageSmoothingEnabled = false;
 
 const W = canvas.width;
 const H = canvas.height;
@@ -30,6 +31,7 @@ const expLabel = document.getElementById("expLabel");
 const levelText = document.getElementById("levelText");
 const timeText = document.getElementById("timeText");
 const killText = document.getElementById("killText");
+const barrierText = document.getElementById("barrierText");
 
 const titleOverlay = document.getElementById("titleOverlay");
 const levelOverlay = document.getElementById("levelOverlay");
@@ -45,7 +47,7 @@ const retryButton = document.getElementById("retryButton");
 // ------------------------------
 // ゲーム調整値
 // ------------------------------
-const CLEAR_TIME = 300; // 10分 = 600秒。テスト時は 60 などに短くすると確認しやすいです。
+const CLEAR_TIME = 600; // 10分 = 600秒。テスト時は 60 などに短くすると確認しやすいです。
 const PLAYER_RADIUS = 13;
 const GEM_RADIUS = 6;
 
@@ -105,6 +107,16 @@ const ENEMY_TYPES = {
 };
 
 // ------------------------------
+// アイテムタイプ定義
+// 敵を倒した時に確率で落ちる追加アイテムです。
+// ------------------------------
+const ITEM_TYPES = {
+  magnet: { name: "経験値吸収", color: "#38bdf8", radius: 12, dropRate: 0.035 },
+  heal: { name: "HP回復", color: "#ef4444", radius: 12, dropRate: 0.06, healAmount: 30 },
+  barrier: { name: "バリア", color: "#a855f7", radius: 12, dropRate: 0.04, duration: 8 },
+};
+
+// ------------------------------
 // 入力状態
 // ------------------------------
 const keys = new Set();
@@ -142,6 +154,8 @@ function createInitialGame() {
     bossSpawned: false,
     kills: 0,
     cameraShake: 0,
+    message: "",
+    messageTimer: 0,
     player: {
       x: W / 2,
       y: H / 2,
@@ -154,6 +168,8 @@ function createInitialGame() {
       nextExp: 10,
       pickupRange: 42,
       invincibleTime: 0,
+      barrierTime: 0,
+      barrierBonus: 0,
       knifeLevel: 1,
       fireLevel: 0,
       lightningLevel: 0,
@@ -162,6 +178,7 @@ function createInitialGame() {
     enemies: [],
     projectiles: [],
     gems: [],
+    items: [],
     effects: [],
     timers: {
       knife: 0,
@@ -226,6 +243,13 @@ const UPGRADE_POOL = [
       game.player.attackSpeedRate *= 0.9;
     },
   },
+  {
+    title: "バリア時間アップ",
+    desc: "バリアアイテム取得時の効果時間を2秒伸ばします。",
+    apply: () => {
+      game.player.barrierBonus += 2;
+    },
+  },
 ];
 
 // ------------------------------
@@ -287,6 +311,8 @@ function loop(now) {
 function update(dt) {
   game.elapsed += dt;
   game.cameraShake = Math.max(0, game.cameraShake - dt * 18);
+  game.messageTimer = Math.max(0, game.messageTimer - dt);
+  if (game.messageTimer <= 0) game.message = "";
 
   updatePlayer(dt);
   spawnEnemies(dt);
@@ -294,6 +320,7 @@ function update(dt) {
   updateAttacks(dt);
   updateProjectiles(dt);
   updateGems(dt);
+  updateItems(dt);
   updateEffects(dt);
   checkPlayerDamage();
   checkClearOrGameOver();
@@ -324,6 +351,7 @@ function updatePlayer(dt) {
   p.y = clamp(p.y, p.radius, H - p.radius);
 
   p.invincibleTime = Math.max(0, p.invincibleTime - dt);
+  p.barrierTime = Math.max(0, p.barrierTime - dt);
 }
 
 // ------------------------------
@@ -583,6 +611,7 @@ function removeDeadEnemies() {
     if (e.hp <= 0) {
       game.kills += e.score;
       dropGem(e.x, e.y, e.exp);
+      tryDropItem(e.x, e.y, e.typeKey);
       game.effects.push({
         type: "pop",
         x: e.x,
@@ -605,6 +634,22 @@ function dropGem(x, y, value) {
     value,
     bob: Math.random() * Math.PI * 2,
   });
+}
+
+function tryDropItem(x, y, enemyTypeKey) {
+  const bonus = enemyTypeKey === "boss" ? 3.0 : 1.0;
+  const roll = Math.random();
+  const healRate = ITEM_TYPES.heal.dropRate * bonus;
+  const barrierRate = ITEM_TYPES.barrier.dropRate * bonus;
+  const magnetRate = ITEM_TYPES.magnet.dropRate * bonus;
+  if (roll < healRate) dropItem("heal", x, y);
+  else if (roll < healRate + barrierRate) dropItem("barrier", x, y);
+  else if (roll < healRate + barrierRate + magnetRate) dropItem("magnet", x, y);
+}
+
+function dropItem(typeKey, x, y) {
+  const type = ITEM_TYPES[typeKey];
+  game.items.push({ typeKey, name: type.name, x, y, radius: type.radius, bob: Math.random() * Math.PI * 2, life: 60 });
 }
 
 // ------------------------------
@@ -631,6 +676,64 @@ function updateGems(dt) {
       game.gems.splice(i, 1);
     }
   }
+}
+
+function updateItems(dt) {
+  const p = game.player;
+  for (let i = game.items.length - 1; i >= 0; i--) {
+    const item = game.items[i];
+    item.bob += dt * 6;
+    item.life -= dt;
+    if (item.life <= 0) { game.items.splice(i, 1); continue; }
+    const d = distance(p.x, p.y, item.x, item.y);
+    const itemPickupRange = p.pickupRange + 18;
+    if (d <= itemPickupRange) {
+      const angle = Math.atan2(p.y - item.y, p.x - item.x);
+      const pullSpeed = 180 + (itemPickupRange - d) * 5;
+      item.x += Math.cos(angle) * pullSpeed * dt;
+      item.y += Math.sin(angle) * pullSpeed * dt;
+    }
+    if (d <= p.radius + item.radius) {
+      applyItem(item.typeKey);
+      game.items.splice(i, 1);
+    }
+  }
+}
+
+function applyItem(typeKey) {
+  const p = game.player;
+  if (typeKey === "magnet") {
+    collectAllGems();
+    showMessage("EXP全吸収！");
+    game.effects.push({ type: "circle", x: p.x, y: p.y, radius: 150, life: 0.45, maxLife: 0.45, color: "#38bdf8" });
+  }
+  if (typeKey === "heal") {
+    const amount = ITEM_TYPES.heal.healAmount;
+    p.hp = Math.min(p.maxHp, p.hp + amount);
+    showMessage(`HP +${amount}`);
+    game.effects.push({ type: "circle", x: p.x, y: p.y, radius: 70, life: 0.35, maxLife: 0.35, color: "#ef4444" });
+  }
+  if (typeKey === "barrier") {
+    const duration = ITEM_TYPES.barrier.duration + p.barrierBonus;
+    p.barrierTime = Math.max(p.barrierTime, duration);
+    showMessage(`BARRIER ${duration}s`);
+    game.effects.push({ type: "circle", x: p.x, y: p.y, radius: 95, life: 0.35, maxLife: 0.35, color: "#a855f7" });
+  }
+}
+
+function collectAllGems() {
+  let total = 0;
+  for (const g of game.gems) {
+    total += g.value;
+    game.effects.push({ type: "spark", x: clamp(g.x, 0, W), y: clamp(g.y, 0, H), radius: 8, life: 0.25, maxLife: 0.25, color: "#38bdf8" });
+  }
+  game.gems = [];
+  if (total > 0) gainExp(total);
+}
+
+function showMessage(text) {
+  game.message = text;
+  game.messageTimer = 1.5;
 }
 
 function gainExp(value) {
@@ -705,6 +808,12 @@ function checkPlayerDamage() {
 
   for (const e of game.enemies) {
     if (distance(p.x, p.y, e.x, e.y) <= p.radius + e.radius) {
+      if (p.barrierTime > 0) {
+        p.invincibleTime = 0.25;
+        game.cameraShake = 3;
+        game.effects.push({ type: "circle", x: p.x, y: p.y, radius: 42, life: 0.18, maxLife: 0.18, color: "#a855f7" });
+        return;
+      }
       p.hp -= e.damage;
       p.invincibleTime = 0.65;
       game.cameraShake = 8;
@@ -755,6 +864,7 @@ function updateUI() {
   levelText.textContent = `Lv.${p.level}`;
   timeText.textContent = formatTime(game.elapsed);
   killText.textContent = `KILL ${game.kills}`;
+  if (barrierText) barrierText.textContent = p.barrierTime > 0 ? `BARRIER ${p.barrierTime.toFixed(1)}` : "BARRIER -";
 }
 
 // ------------------------------
@@ -774,11 +884,13 @@ function draw() {
 
   drawBackground();
   drawGems();
+  drawItems();
   drawEnemies();
   drawProjectiles();
   drawPlayer();
   drawEffects();
   drawWeaponInfo();
+  drawMessage();
 
   ctx.restore();
 }
@@ -809,6 +921,15 @@ function drawBackground() {
 function drawPlayer() {
   const p = game.player;
   const blink = p.invincibleTime > 0 && Math.floor(performance.now() / 80) % 2 === 0;
+  if (p.barrierTime > 0) {
+    ctx.globalAlpha = 0.35 + Math.sin(performance.now() / 120) * 0.12;
+    ctx.strokeStyle = "#a855f7";
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 31, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
   if (blink) return;
 
   ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
@@ -867,6 +988,24 @@ function drawGems() {
   }
 }
 
+function drawItems() {
+  for (const item of game.items) {
+    const type = ITEM_TYPES[item.typeKey];
+    const bobY = Math.sin(item.bob) * 3;
+    ctx.save();
+    ctx.translate(item.x, item.y + bobY);
+    ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
+    ctx.fillRect(-10, 12, 20, 5);
+    if (item.typeKey === "magnet") drawMagnetItem(type.color);
+    else if (item.typeKey === "heal") drawHealItem(type.color);
+    else if (item.typeKey === "barrier") drawBarrierItem(type.color);
+    ctx.restore();
+  }
+}
+function drawMagnetItem(color) { ctx.fillStyle = "#0f172a"; ctx.fillRect(-12, -12, 24, 24); ctx.fillStyle = color; ctx.fillRect(-10, -10, 7, 18); ctx.fillRect(3, -10, 7, 18); ctx.fillRect(-10, 5, 20, 5); ctx.fillStyle = "#e0f2fe"; ctx.fillRect(-10, -10, 7, 4); ctx.fillRect(3, -10, 7, 4); }
+function drawHealItem(color) { ctx.fillStyle = "#f8fafc"; ctx.fillRect(-12, -12, 24, 24); ctx.strokeStyle = "#7f1d1d"; ctx.strokeRect(-12, -12, 24, 24); ctx.fillStyle = color; ctx.fillRect(-4, -9, 8, 18); ctx.fillRect(-9, -4, 18, 8); }
+function drawBarrierItem(color) { ctx.fillStyle = "#0f172a"; ctx.beginPath(); ctx.moveTo(0, -14); ctx.lineTo(12, -8); ctx.lineTo(9, 8); ctx.lineTo(0, 15); ctx.lineTo(-9, 8); ctx.lineTo(-12, -8); ctx.closePath(); ctx.fill(); ctx.fillStyle = color; ctx.beginPath(); ctx.moveTo(0, -11); ctx.lineTo(9, -6); ctx.lineTo(7, 7); ctx.lineTo(0, 12); ctx.lineTo(-7, 7); ctx.lineTo(-9, -6); ctx.closePath(); ctx.fill(); ctx.fillStyle = "#f5d0fe"; ctx.fillRect(-2, -7, 4, 13); }
+
 function drawEffects() {
   for (const ef of game.effects) {
     const rate = ef.life / ef.maxLife;
@@ -901,6 +1040,11 @@ function drawEffects() {
         ef.radius * 2 * (1 - rate)
       );
     }
+    if (ef.type === "spark") {
+      ctx.fillStyle = ef.color;
+      ctx.fillRect(ef.x - 2, ef.y - 8, 4, 16);
+      ctx.fillRect(ef.x - 8, ef.y - 2, 16, 4);
+    }
 
     ctx.globalAlpha = 1;
   }
@@ -910,16 +1054,22 @@ function drawWeaponInfo() {
   const p = game.player;
 
   ctx.fillStyle = "rgba(2, 6, 23, 0.72)";
-  ctx.fillRect(12, H - 78, 260, 58);
+  ctx.fillRect(12, H - 102, 300, 82);
 
   ctx.strokeStyle = "#334155";
-  ctx.strokeRect(12, H - 78, 260, 58);
+  ctx.strokeRect(12, H - 102, 300, 82);
 
   ctx.fillStyle = "#e5e7eb";
   ctx.font = "14px Courier New";
-  ctx.fillText(`Knife Lv.${p.knifeLevel}`, 24, H - 52);
-  ctx.fillText(`Fire Lv.${p.fireLevel}`, 124, H - 52);
-  ctx.fillText(`Lightning Lv.${p.lightningLevel}`, 24, H - 30);
+  ctx.fillText(`Knife Lv.${p.knifeLevel}`, 24, H - 72);
+  ctx.fillText(`Fire Lv.${p.fireLevel}`, 124, H - 72);
+  ctx.fillText(`Lightning Lv.${p.lightningLevel}`, 24, H - 50);
+  ctx.fillText(`Items: Magnet / Heal / Barrier`, 24, H - 28);
+}
+
+function drawMessage() {
+  if (!game.message || game.messageTimer <= 0) return;
+  ctx.save(); ctx.globalAlpha = clamp(game.messageTimer, 0, 1); ctx.fillStyle = "rgba(2, 6, 23, 0.78)"; ctx.fillRect(W / 2 - 130, 70, 260, 42); ctx.strokeStyle = "#facc15"; ctx.strokeRect(W / 2 - 130, 70, 260, 42); ctx.fillStyle = "#facc15"; ctx.font = "bold 20px Courier New"; ctx.textAlign = "center"; ctx.fillText(game.message, W / 2, 98); ctx.restore();
 }
 
 // ------------------------------
