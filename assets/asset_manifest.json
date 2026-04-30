@@ -21,5 +21,24 @@
     "Sprites are centered in their source files as much as possible.",
     "Shadows are drawn by Canvas, not baked into sprites.",
     "Adjust SPRITE_SIZES in game.js for final gameplay balance."
-  ]
+  ],
+  "items": {
+    "magnet": "assets/items/magnet.png",
+    "heal_cross": "assets/items/heal_cross.png",
+    "barrier_shield": "assets/items/barrier_shield.png",
+    "rin_dual_pistols": "assets/items/rin_dual_pistols.png"
+  },
+  "item_processing": {
+    "transparent": true,
+    "canvas": [
+      256,
+      256
+    ],
+    "centered": true,
+    "source_design": "approved item designs from this conversation",
+    "notes": [
+      "Background removed programmatically from approved designs.",
+      "Checkerboard is included only in assets/items_transparency_preview.png, not in production item PNGs."
+    ]
+  }
 }

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Direct Asset Layout Preview</title>
+<style>
+body{margin:0;background:#081629;color:#fff;font-family:monospace}
+.stage{position:relative;width:960px;height:540px;margin:20px auto;overflow:hidden;border:4px solid #36d9ff}
+.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.sprite{position:absolute;transform:translate(-50%,-100%);image-rendering:pixelated}
+.item{position:absolute;transform:translate(-50%,-50%);image-rendering:pixelated}
+.label{position:absolute;left:10px;top:10px;background:rgba(0,0,0,.7);padding:8px;border:1px solid #fff}
+</style>
+</head>
+<body>
+<div class="stage">
+<img class="bg" src="assets/backgrounds/rin_city_plaza_field.png">
+<div class="label">DIRECT ASSET PREVIEW - ここで画像が見えれば素材パスはOK</div>
+<img class="sprite" src="assets/player/rin/idle/frame_01.png" style="left:50%;top:58%;width:74px;height:98px">
+<img class="sprite" src="assets/enemies/slime/frame_01.png" style="left:28%;top:74%;width:62px;height:50px">
+<img class="sprite" src="assets/enemies/bat/frame_01.png" style="left:27%;top:35%;width:76px;height:62px">
+<img class="sprite" src="assets/enemies/golem/frame_01.png" style="left:68%;top:38%;width:124px;height:124px">
+<img class="sprite" src="assets/enemies/boss/frame_01.png" style="left:77%;top:83%;width:196px;height:196px">
+<img class="item" src="assets/items/magnet.png" style="left:42%;top:77%;width:48px;height:48px">
+<img class="item" src="assets/items/heal_cross.png" style="left:50%;top:77%;width:48px;height:48px">
+<img class="item" src="assets/items/barrier_shield.png" style="left:58%;top:77%;width:52px;height:52px">
+</div>
+</body>
+</html>
