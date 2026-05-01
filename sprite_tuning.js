@@ -4,7 +4,7 @@
   function tuneSprites() {
     try {
       if (typeof SPRITE !== 'undefined') {
-        // Stronger scale-down: about one third smaller than the previous tuned size.
+        // Game-field sprites stay small for better visibility and play space.
         if (SPRITE.player) {
           SPRITE.player.w = 44;
           SPRITE.player.h = 58;
@@ -29,9 +29,10 @@
   }
 
   function tuneCharacterSelectDot() {
+    // Character select icon is intentionally larger than the in-game sprite.
     document.querySelectorAll('.character-cell img').forEach(function (img) {
-      img.style.width = '52px';
-      img.style.height = '52px';
+      img.style.width = '88px';
+      img.style.height = '88px';
       img.style.maxWidth = 'none';
       img.style.maxHeight = 'none';
       img.style.objectFit = 'contain';
