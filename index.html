@@ -4,14 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RIN SURVIVORS - Prototype</title>
-  <link rel="stylesheet" href="style.css?v=official-rin-portrait-3" />
+  <link rel="stylesheet" href="style.css?v=player-rin-portrait-1" />
 </head>
 <body>
   <main class="game-shell">
     <div class="hud-layer">
       <section class="player-panel ui-panel">
         <div class="portrait-frame">
-          <img class="hud-rin-portrait" src="assets/player/rin_portrait.png?v=official-rin-portrait-3" alt="Rin official portrait" />
+          <img class="hud-rin-portrait" src="player/rin_portrait.png?v=player-rin-portrait-1" alt="Rin official portrait" />
         </div>
         <div class="player-info">
           <div class="player-row">
@@ -71,7 +71,7 @@
               </div>
             </section>
             <aside class="character-detail-panel">
-              <div class="character-portrait-wrap official-rin-portrait-wrap"><img id="characterPortrait" class="official-rin-portrait" src="assets/player/rin_portrait.png?v=official-rin-portrait-3" alt="Rin official normal portrait" /></div>
+              <div class="character-portrait-wrap official-rin-portrait-wrap"><img id="characterPortrait" class="official-rin-portrait" src="player/rin_portrait.png?v=player-rin-portrait-1" alt="Rin official normal portrait" /></div>
               <div class="character-profile"><div class="character-name-row"><h3 id="characterName">Rin</h3><span id="characterVersion">Normal</span></div><p id="characterDesc">Dual-pistol survivor with balanced speed and stable firepower.</p><div class="character-stats"><div><span>HP</span><b>100</b></div><div><span>Speed</span><b>Normal</b></div><div><span>Weapon</span><b>Dual Pistols</b></div></div></div>
             </aside>
           </div>
@@ -87,10 +87,10 @@
     </section>
     <div class="help-text">操作：W/A/S/D または 矢印キーで移動 / Spaceで一時停止<br />追加アイテム：青い磁石 = 経験値全吸収 / 赤い十字 = HP回復 / 紫の盾 = 一定時間バリア</div>
   </main>
-  <script src="game.js?v=official-rin-portrait-3"></script>
+  <script src="game.js?v=player-rin-portrait-1"></script>
   <script>
     window.__forceOfficialRinPortrait = function () {
-      var src = 'assets/player/rin_portrait.png?v=official-rin-portrait-3-' + Date.now();
+      var src = 'player/rin_portrait.png?v=player-rin-portrait-1-' + Date.now();
       document.querySelectorAll('#characterPortrait, .official-rin-portrait, .hud-rin-portrait').forEach(function (img) {
         if (img) img.src = src;
       });
@@ -98,14 +98,8 @@
     window.__forceStartRin = function (event) {
       if (event) { event.preventDefault(); event.stopPropagation(); }
       window.__forceOfficialRinPortrait();
-      if (typeof window.startGame === 'function') {
-        window.startGame();
-        return false;
-      }
-      if (typeof startGame === 'function') {
-        startGame();
-        return false;
-      }
+      if (typeof window.startGame === 'function') { window.startGame(); return false; }
+      if (typeof startGame === 'function') { startGame(); return false; }
       var overlays = ['titleOverlay', 'characterOverlay', 'levelOverlay', 'pauseOverlay', 'resultOverlay'];
       overlays.forEach(function (id) { var el = document.getElementById(id); if (el) el.classList.remove('show'); });
       if (window.game) { window.game.state = 'playing'; window.game.selectedCharacter = 'rin'; }
