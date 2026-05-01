@@ -1,101 +1,48 @@
-# ヴァンサバ風 2Dアクション試作品 v2
+# RIN SURVIVORS - Character Select Test Version
+
+GitHub Pages用のフラット構成です。
 
 ## 追加内容
 
-以下を追加しました。
+- キャラクター選択画面を追加
+- 3x3の9マス選択グリッドを追加
+- 現時点ではRinのみ選択可能
+- 未実装枠は `?` 表示
+- 右側にRinの立ち絵表示
+- 選択マスにはRinのドット絵を表示
+
+## 配置
 
 ```text
-・経験値吸収アイテム
-・HP回復アイテム
-・一定時間バリアアイテム
+index.html
+style.css
+game.js
+assets/
+  characters/rin/portrait.png
+  characters/rin/dot.png
+  player/rin/idle/frame_01.png
 ```
 
-## 追加アイテム
+## 確認
 
-### 経験値吸収アイテム
+1. `index.html` を開く
+2. タイトル画面の Start Game を押す
+3. CHARACTER SELECT 画面へ移動
+4. Rinを選択したまま Start でゲーム開始
 
-青い磁石の見た目のアイテムです。
+## GitHub Pages
 
-```text
-落ちている経験値をすべて回収する
-画面外や遠くに落ちた経験値もまとめて取得する
-```
-
-### HP回復アイテム
-
-赤い十字の見た目のアイテムです。
-
-```text
-HPを30回復する
-最大HPを超えては回復しない
-```
-
-### バリアアイテム
-
-紫の盾の見た目のアイテムです。
-
-```text
-8秒間、敵との接触ダメージを無効化する
-バリア中はプレイヤーの周囲に紫の円が表示される
-```
-
-## 実行方法
-
-```text
-1. ZIPを展開
-2. index.html をブラウザで開く
-3. ゲーム開始
-```
-
-## 調整する場所
-
-### ドロップ率
-
-`game.js` の `ITEM_TYPES` を変更します。
-
-```js
-const ITEM_TYPES = {
-  magnet: { dropRate: 0.035 },
-  heal: { dropRate: 0.06 },
-  barrier: { dropRate: 0.04 },
-};
-```
-
-### 回復量
-
-```js
-healAmount: 30
-```
-
-### バリア時間
-
-```js
-duration: 8
-```
-
-### アイテムが消えるまでの時間
-
-```js
-life: 60
-```
-
-不要なら `Infinity` にしてもOKです。
+このZIPの中身をリポジトリ直下に置いてください。
 
 
-## 画像組み込み版の追加内容
+## Effects update
 
-このZIPでは、既存の試作ゲーム4ファイルを基準に、以下の画像素材を `assets/` から読み込むようにしました。
+炎・雷・銃撃・アイテム取得エフェクトを追加しました。
 
-- `assets/player/rin_spritesheet.png` : ゲーム内Rinドット絵 4フレーム
-- `assets/player/rin_portrait.png` : タイトル画面用Rin公式透過立ち絵
-- `assets/enemies/*_spritesheet.png` : slime / bat / golem / boss の2フレーム敵素材
-- `assets/items/magnet.png` : 青い磁石 = 経験値全吸収
-- `assets/items/heal_cross.png` : 赤い十字 = HP回復
-- `assets/items/barrier.png` : 紫の盾 = 一定時間バリア
-- `assets/items/gem.png` : 経験値ジェム表示用
-- `assets/ui/icon_*.png` : HP / EXP / 武器 / 炎 / 雷のUIアイコン
-- `assets/background/grid_tile.png` : 背景グリッドタイル
+- Fire Aura: 炎リング + 炎粒子
+- Lightning: 分岐付き落雷 + 着弾リング
+- Bullet: トレイル + マズルフラッシュ + ヒットスパーク
+- Damage: ダメージ数値
+- Items: グロー + 取得バースト
 
-確認キー：`T` でアイテム3種をプレイヤー近くに出し、`Y` で炎・雷エフェクトを出します。
-
-素材仕様：透過PNG、中心配置、素材自体には床影を焼き込まず、ゲーム描画側で楕円影を表示しています。
+詳細は `docs/EFFECTS.md` を確認してください。

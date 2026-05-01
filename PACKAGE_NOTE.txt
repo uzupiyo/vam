@@ -1,0 +1,1 @@
+Final game files package based on the latest Rin game build in this conversation: character select + UI + image assets + effects. Place contents at the GitHub repository root for GitHub Pages.
