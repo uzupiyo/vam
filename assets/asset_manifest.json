@@ -1,6 +1,26 @@
 {
   "project": "RIN SURVIVORS",
   "version": "ui_assets_integrated",
+  "characters": {
+    "rin": {
+      "order": 1,
+      "dot": "assets/characters/rin/dot.png",
+      "portrait": "assets/characters/rin/portrait.png",
+      "idle": "assets/player/rin/idle/frame_01.png ... frame_04.png",
+      "weapon": "Dual Pistols"
+    },
+    "beniko": {
+      "order": 2,
+      "dot": "assets/characters/beniko/dot.png",
+      "portrait": "assets/characters/beniko/portrait.png",
+      "manifest": "assets/characters/beniko/manifest.json",
+      "idle_gif": "assets/characters/beniko/idle.gif",
+      "idle": "assets/player/beniko/idle/frame_01.png ... frame_04.png",
+      "weapon": "Game Controller",
+      "normal_attack": "Star Magic",
+      "projectile": "assets/effects/beniko/star_magic_projectile.svg"
+    }
+  },
   "assets": {
     "player": "assets/player/rin/idle/frame_01.png ... frame_04.png",
     "enemies": {
@@ -15,12 +35,16 @@
       "assets/items/barrier_shield.png",
       "assets/items/rin_dual_pistols.png"
     ],
+    "effects": {
+      "beniko_star_magic_projectile": "assets/effects/beniko/star_magic_projectile.svg"
+    },
     "background": "assets/backgrounds/rin_city_plaza_field.png"
   },
   "notes": [
     "Sprites are centered in their source files as much as possible.",
     "Shadows are drawn by Canvas, not baked into sprites.",
-    "Adjust SPRITE_SIZES in game.js for final gameplay balance."
+    "Adjust SPRITE_SIZES in game.js for final gameplay balance.",
+    "Beniko is the second character. Her unique weapon is a game controller and her normal attack is blue star magic."
   ],
   "items": {
     "magnet": "assets/items/magnet.png",
