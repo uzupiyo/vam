@@ -4,15 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RIN SURVIVORS - Prototype</title>
-  <link rel="stylesheet" href="style.css?v=pixel-ui-fix-1" />
-  <link rel="stylesheet" href="ui_fix.css?v=pixel-ui-fix-1" />
+  <link rel="stylesheet" href="style.css?v=pixel-ui-fix-2" />
+  <link rel="stylesheet" href="ui_fix.css?v=pixel-ui-fix-2" />
 </head>
 <body>
   <main class="game-shell">
     <div class="hud-layer">
       <section class="player-panel ui-panel">
         <div class="portrait-frame">
-          <img class="hud-rin-portrait" src="player/rin_portrait.png?v=pixel-ui-fix-1" alt="Rin official portrait" />
+          <img class="hud-rin-portrait" src="player/rin_portrait.png?v=pixel-ui-fix-2" alt="Rin official portrait" />
         </div>
         <div class="player-info">
           <div class="player-row">
@@ -72,7 +72,7 @@
               </div>
             </section>
             <aside class="character-detail-panel">
-              <div class="character-portrait-wrap official-rin-portrait-wrap"><img id="characterPortrait" class="official-rin-portrait" src="player/rin_portrait.png?v=pixel-ui-fix-1" alt="Rin official normal portrait" /></div>
+              <div class="character-portrait-wrap official-rin-portrait-wrap"><img id="characterPortrait" class="official-rin-portrait" src="player/rin_portrait.png?v=pixel-ui-fix-2" alt="Rin official normal portrait" /></div>
               <div class="character-profile"><div class="character-name-row"><h3 id="characterName">Rin</h3><span id="characterVersion">Normal</span></div><p id="characterDesc">Dual-pistol survivor with balanced speed and stable firepower.</p><div class="character-stats"><div><span>HP</span><b>100</b></div><div><span>Speed</span><b>Normal</b></div><div><span>Weapon</span><b>Dual Pistols</b></div></div></div>
             </aside>
           </div>
@@ -88,11 +88,11 @@
     </section>
     <div class="help-text">操作：W/A/S/D または 矢印キーで移動 / Spaceで一時停止<br />追加アイテム：青い磁石 = 経験値全吸収 / 赤い十字 = HP回復 / 紫の盾 = 一定時間バリア</div>
   </main>
-  <script src="game.js?v=pixel-ui-fix-1"></script>
-  <script src="runtime_pixel_fix.js?v=pixel-ui-fix-1"></script>
+  <script src="game.js?v=pixel-ui-fix-2"></script>
+  <script src="runtime_pixel_fix.js?v=pixel-ui-fix-2"></script>
   <script>
     window.__forceOfficialRinPortrait = function () {
-      var src = 'player/rin_portrait.png?v=pixel-ui-fix-1-' + Date.now();
+      var src = 'player/rin_portrait.png?v=pixel-ui-fix-2-' + Date.now();
       document.querySelectorAll('#characterPortrait, .official-rin-portrait, .hud-rin-portrait').forEach(function (img) {
         if (img) img.src = src;
       });
