@@ -1,6 +1,6 @@
 /* Beniko character select / runtime patch */
 (function () {
-  const BENIKO_PATCH_VERSION = 'beniko-select-1';
+  const BENIKO_PATCH_VERSION = 'beniko-select-2';
 
   const CHARACTER_DATA = {
     rin: {
@@ -18,12 +18,12 @@
       id: 'beniko',
       name: 'Beniko',
       version: 'Star Mage',
-      desc: 'Controller mage who fires blue star-shaped energy bullets.',
+      desc: 'ゲームコントローラーを媒体に、青い星形エネルギー弾を撃つ狐娘。',
       weapon: 'Game Controller',
       dot: 'assets/characters/beniko/dot.png',
       portrait: 'assets/characters/beniko/portrait.png',
       hudPortrait: 'assets/characters/beniko/portrait.png',
-      sprite: { w: 54, h: 54 }
+      sprite: { w: 58, h: 58 }
     }
   };
 
@@ -46,15 +46,19 @@
 
   function ensureBenikoCell() {
     const grid = document.getElementById('characterGrid');
-    if (!grid || grid.querySelector('[data-character="beniko"]')) return;
-    const firstLocked = grid.querySelector('.character-cell.locked');
-    const cell = document.createElement('button');
-    cell.className = 'character-cell';
-    cell.dataset.character = 'beniko';
-    cell.type = 'button';
+    if (!grid) return;
+    let cell = grid.querySelector('[data-character="beniko"]');
+    if (!cell) {
+      const firstLocked = grid.querySelector('.character-cell.locked');
+      cell = document.createElement('button');
+      cell.className = 'character-cell';
+      cell.dataset.character = 'beniko';
+      cell.type = 'button';
+      if (firstLocked) firstLocked.replaceWith(cell);
+      else grid.appendChild(cell);
+    }
+    cell.classList.remove('locked');
     cell.innerHTML = `<img src="${cacheBust(CHARACTER_DATA.beniko.dot)}" alt="Beniko dot" /><span>Beniko</span>`;
-    if (firstLocked) firstLocked.replaceWith(cell);
-    else grid.appendChild(cell);
   }
 
   function setCharacterDetail(key) {
@@ -64,6 +68,10 @@
     const version = document.getElementById('characterVersion');
     const desc = document.getElementById('characterDesc');
     const statBlocks = document.querySelectorAll('.character-stats > div b');
+
+    document.querySelectorAll('#characterGrid .character-cell').forEach((cell) => {
+      if (cell.dataset.character) cell.classList.toggle('selected', cell.dataset.character === key);
+    });
 
     if (portrait) {
       portrait.src = cacheBust(data.portrait);
@@ -106,16 +114,15 @@
   selectCharacter = function patchedSelectCharacter(key) {
     if (!CHARACTER_DATA[key]) return;
     selectedCharacter = key;
-    document.querySelectorAll('#characterGrid .character-cell').forEach((cell) => {
-      cell.classList.toggle('selected', cell.dataset.character === key);
-    });
     setCharacterDetail(key);
   };
 
   const originalStartGame = typeof startGame === 'function' ? startGame : null;
   startGame = function patchedStartGame() {
+    const chosen = selectedCharacter && CHARACTER_DATA[selectedCharacter] ? selectedCharacter : 'rin';
+    selectedCharacter = chosen;
     game = createInitialGame();
-    game.selectedCharacter = selectedCharacter;
+    game.selectedCharacter = chosen;
     game.state = 'playing';
     keys.clear();
     hideAllOverlays();
@@ -242,20 +249,43 @@
   function bindBenikoCharacterSelect() {
     ensureBenikoCell();
     const grid = document.getElementById('characterGrid');
-    if (!grid) return;
-    grid.addEventListener('click', (ev) => {
-      const cell = ev.target.closest('.character-cell');
-      if (cell?.dataset.character && CHARACTER_DATA[cell.dataset.character]) selectCharacter(cell.dataset.character);
-    }, true);
-    grid.addEventListener('dblclick', (ev) => {
-      const cell = ev.target.closest('.character-cell');
-      if (cell?.dataset.character && CHARACTER_DATA[cell.dataset.character]) {
-        selectCharacter(cell.dataset.character);
+    if (grid) {
+      grid.addEventListener('click', (ev) => {
+        const cell = ev.target.closest('.character-cell');
+        if (cell?.dataset.character && CHARACTER_DATA[cell.dataset.character]) {
+          ev.preventDefault();
+          ev.stopImmediatePropagation();
+          selectCharacter(cell.dataset.character);
+        }
+      }, true);
+      grid.addEventListener('dblclick', (ev) => {
+        const cell = ev.target.closest('.character-cell');
+        if (cell?.dataset.character && CHARACTER_DATA[cell.dataset.character]) {
+          ev.preventDefault();
+          ev.stopImmediatePropagation();
+          selectCharacter(cell.dataset.character);
+          startGame();
+        }
+      }, true);
+    }
+
+    const confirm = document.getElementById('confirmCharacterButton');
+    if (confirm) {
+      confirm.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        ev.stopImmediatePropagation();
         startGame();
-      }
-    }, true);
+      }, true);
+    }
   }
 
+  const originalOpenCharacterSelect = typeof openCharacterSelect === 'function' ? openCharacterSelect : null;
+  openCharacterSelect = function patchedOpenCharacterSelect() {
+    originalOpenCharacterSelect?.();
+    ensureBenikoCell();
+    setCharacterDetail(selectedCharacter || 'rin');
+  };
+
   bindBenikoCharacterSelect();
-  setCharacterDetail(selectedCharacter);
+  setCharacterDetail(selectedCharacter || 'rin');
 })();
