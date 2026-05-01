@@ -4,14 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RIN SURVIVORS - Prototype</title>
-  <link rel="stylesheet" href="style.css?v=skill-fx-1" />
-  <link rel="stylesheet" href="ui_fix.css?v=skill-fx-1" />
+  <link rel="stylesheet" href="style.css?v=skill-fx-force-1" />
+  <link rel="stylesheet" href="ui_fix.css?v=skill-fx-force-1" />
 </head>
 <body>
   <main class="game-shell">
     <div class="hud-layer">
       <section class="player-panel ui-panel">
-        <div class="portrait-frame"><img class="hud-rin-portrait" src="player/rin_portrait.png?v=skill-fx-1" alt="Rin official portrait" /></div>
+        <div class="portrait-frame"><img class="hud-rin-portrait" src="player/rin_portrait.png?v=skill-fx-force-1" alt="Rin official portrait" /></div>
         <div class="player-info"><div class="player-row"><span class="player-name">Rin</span><span id="levelText" class="level-chip">Lv.1</span></div><div class="bar-box hp-box"><div id="hpFill" class="bar-fill"></div><div id="hpLabel" class="bar-label">HP 100 / 100</div></div><div class="bar-box exp-mini-box"><div id="expFillMini" class="bar-fill"></div><div class="bar-label mini-label">NEXT EXP</div></div><div class="stat-row"><span>🔫 <b id="statAttack">1</b></span><span>🛡 <b id="statBarrier">0</b></span><span>⚡ <b id="statSpeed">1.00</b></span><span>🍀 <b id="statLuck">0%</b></span></div></div>
       </section>
       <section class="timer-panel ui-panel"><div id="timeText" class="timer-text">00:00</div><div class="stage-label">Rin City Plaza</div></section>
@@ -23,7 +23,7 @@
       <div id="assetStatus" class="asset-status">ASSETS LOADING...</div>
       <div id="previewBadge" class="preview-badge">ASSET PREVIEW MODE</div>
       <div id="titleOverlay" class="overlay title-overlay"><div class="title-screen"><div class="title-logo"><span class="title-rin">RIN</span><span class="title-survivors">SURVIVORS</span><small>Modern Pixel Survival Action</small></div><div class="title-visual"><div class="rin-key-card"><div class="rin-key-face">Rin</div><p>Dual Pistols Ready</p></div></div><nav class="title-menu"><button id="startButton" class="menu-button primary" type="button"><span>▶</span> Start Game</button><button class="menu-button" type="button"><span>⚙</span> Options</button><button class="menu-button" type="button"><span>♥</span> Collection</button><button class="menu-button" type="button"><span>↩</span> Exit</button></nav><div class="press-start">» ♥ Press Start ♥ «</div><div class="version-label">ver. prototype</div></div></div>
-      <div id="characterOverlay" class="overlay character-overlay"><div class="character-select-screen ui-panel"><div class="character-select-header"><button id="backToTitleButton" class="small-menu-button" type="button">← Title</button><div><h2>CHARACTER SELECT</h2><p>Choose your survivor</p></div><button id="confirmCharacterButton" class="small-menu-button primary" type="button">Start</button></div><div class="character-select-body"><section class="character-grid-panel"><div id="characterGrid" class="character-grid"><button class="character-cell selected" data-character="rin" type="button"><img src="assets/player/rin/idle/frame_01.png" alt="Rin dot" /><span>Rin</span></button><button class="character-cell locked" type="button"><span class="question">?</span><small>Coming Soon</small></button><button class="character-cell locked" type="button"><span class="question">?</span><small>Coming Soon</small></button><button class="character-cell locked" type="button"><span class="question">?</span><small>Coming Soon</small></button><button class="character-cell locked" type="button"><span class="question">?</span><small>Coming Soon</small></button><button class="character-cell locked" type="button"><span class="question">?</span><small>Coming Soon</small></button><button class="character-cell locked" type="button"><span class="question">?</span><small>Coming Soon</small></button><button class="character-cell locked" type="button"><span class="question">?</span><small>Coming Soon</small></button><button class="character-cell locked" type="button"><span class="question">?</span><small>Coming Soon</small></button></div></section><aside class="character-detail-panel"><div class="character-portrait-wrap official-rin-portrait-wrap"><img id="characterPortrait" class="official-rin-portrait" src="player/rin_portrait.png?v=skill-fx-1" alt="Rin official normal portrait" /></div><div class="character-profile"><div class="character-name-row"><h3 id="characterName">Rin</h3><span id="characterVersion">Normal</span></div><p id="characterDesc">Dual-pistol survivor with balanced speed and stable firepower.</p><div class="character-stats"><div><span>HP</span><b>100</b></div><div><span>Speed</span><b>Normal</b></div><div><span>Weapon</span><b>Dual Pistols</b></div></div></div></aside></div></div></div>
+      <div id="characterOverlay" class="overlay character-overlay"><div class="character-select-screen ui-panel"><div class="character-select-header"><button id="backToTitleButton" class="small-menu-button" type="button">← Title</button><div><h2>CHARACTER SELECT</h2><p>Choose your survivor</p></div><button id="confirmCharacterButton" class="small-menu-button primary" type="button">Start</button></div><div class="character-select-body"><section class="character-grid-panel"><div id="characterGrid" class="character-grid"><button class="character-cell selected" data-character="rin" type="button"><img src="assets/player/rin/idle/frame_01.png" alt="Rin dot" /><span>Rin</span></button><button class="character-cell locked" type="button"><span class="question">?</span><small>Coming Soon</small></button><button class="character-cell locked" type="button"><span class="question">?</span><small>Coming Soon</small></button><button class="character-cell locked" type="button"><span class="question">?</span><small>Coming Soon</small></button><button class="character-cell locked" type="button"><span class="question">?</span><small>Coming Soon</small></button><button class="character-cell locked" type="button"><span class="question">?</span><small>Coming Soon</small></button><button class="character-cell locked" type="button"><span class="question">?</span><small>Coming Soon</small></button><button class="character-cell locked" type="button"><span class="question">?</span><small>Coming Soon</small></button><button class="character-cell locked" type="button"><span class="question">?</span><small>Coming Soon</small></button></div></section><aside class="character-detail-panel"><div class="character-portrait-wrap official-rin-portrait-wrap"><img id="characterPortrait" class="official-rin-portrait" src="player/rin_portrait.png?v=skill-fx-force-1" alt="Rin official normal portrait" /></div><div class="character-profile"><div class="character-name-row"><h3 id="characterName">Rin</h3><span id="characterVersion">Normal</span></div><p id="characterDesc">Dual-pistol survivor with balanced speed and stable firepower.</p><div class="character-stats"><div><span>HP</span><b>100</b></div><div><span>Speed</span><b>Normal</b></div><div><span>Weapon</span><b>Dual Pistols</b></div></div></div></aside></div></div></div>
       <div id="levelOverlay" class="overlay level-overlay"><div class="panel level-panel ui-panel"><h2>LEVEL UP!</h2><p>Choose your reward!</p><div id="upgradeList" class="upgrade-list"></div></div></div>
       <div id="pauseOverlay" class="overlay"><div class="panel ui-panel"><h2>PAUSE</h2><p>Space または 右上ボタンで再開します。</p></div></div>
       <div id="resultOverlay" class="overlay"><div class="panel ui-panel"><h1 id="resultTitle">GAME OVER</h1><p id="resultText"></p><div class="button-row"><button id="retryButton" class="menu-button primary" type="button">Retry</button></div></div></div>
@@ -31,13 +31,14 @@
     <section class="bottom-hud ui-panel"><div class="exp-box"><span>♥ EXP</span><div class="bar-box exp-box-main"><div id="expFill" class="bar-fill"></div><div id="expLabel" class="bar-label">EXP 0 / 10</div></div></div><div class="slot-row"><div class="skill-slot active"><span class="slot-num">1</span><strong>Dual Pistols</strong><small id="slotKnife">Lv.1 ★</small></div><div class="skill-slot"><span class="slot-num">2</span><strong>Fire Aura</strong><small id="slotFire">Lv.0 ☆</small></div><div class="skill-slot"><span class="slot-num">3</span><strong>Lightning</strong><small id="slotLightning">Lv.0 ☆</small></div><div class="skill-slot"><span class="slot-num">4</span><strong>Barrier</strong><small id="barrierText">BARRIER -</small></div></div></section>
     <div class="help-text">操作：W/A/S/D または 矢印キーで移動 / Spaceで一時停止<br />追加アイテム：青い磁石 = 経験値全吸収 / 赤い十字 = HP回復 / 紫の盾 = 一定時間バリア</div>
   </main>
-  <script src="game.js?v=skill-fx-1"></script>
-  <script src="sprite_tuning.js?v=skill-fx-1"></script>
-  <script src="projectile_patch.js?v=skill-fx-1"></script>
-  <script src="magnet_effect_patch.js?v=skill-fx-1"></script>
-  <script src="combat_range_patch.js?v=skill-fx-1"></script>
-  <script src="exp_gem_patch.js?v=skill-fx-1"></script>
-  <script src="exp_gem_force_patch.js?v=skill-fx-1"></script>
-  <script src="skill_effect_patch.js?v=skill-fx-1"></script>
+  <script src="game.js?v=skill-fx-force-1"></script>
+  <script src="sprite_tuning.js?v=skill-fx-force-1"></script>
+  <script src="projectile_patch.js?v=skill-fx-force-1"></script>
+  <script src="magnet_effect_patch.js?v=skill-fx-force-1"></script>
+  <script src="combat_range_patch.js?v=skill-fx-force-1"></script>
+  <script src="exp_gem_patch.js?v=skill-fx-force-1"></script>
+  <script src="exp_gem_force_patch.js?v=skill-fx-force-1"></script>
+  <script src="skill_effect_patch.js?v=skill-fx-force-1"></script>
+  <script src="skill_effect_force_patch.js?v=skill-fx-force-1"></script>
 </body>
 </html>
