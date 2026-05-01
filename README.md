@@ -48,8 +48,9 @@ assets/
 詳細は `docs/EFFECTS.md` を確認してください。
 
 
-## 今回の更新：主人公Rin idleモーション反映
+## 2026-05-01 修正メモ
 
-- 主人公のゲーム内表示は `assets/player/rin/idle/frame_01.png` ～ `frame_04.png` を使用します。
-- `game.js` の `ASSET_PATHS.player.idle` で4枚を読み込み、`drawPlayer()` 内で待機モーションとしてアニメーション表示します。
-- Rinの正規デザインと透過PNG仕様を維持しています。
+- 画面遷移・UI・キャラクター選択画面は `final_game_files_latest.zip` のまま維持。
+- 変更箇所は `game.js` の主人公描画のみ。
+- 主人公は `assets/player/rin/idle/frame_01.png`〜`frame_04.png` を6fpsで表示。
+- ブラウザキャッシュ対策として `index.html` の `game.js` 読み込みにバージョンを付与。
