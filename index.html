@@ -4,14 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RIN SURVIVORS - Prototype</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=official-rin-portrait-2" />
 </head>
 <body>
   <main class="game-shell">
     <div class="hud-layer">
       <section class="player-panel ui-panel">
         <div class="portrait-frame">
-          <div class="portrait-placeholder">Rin</div>
+          <img class="hud-rin-portrait" src="assets/player/rin_portrait.png?v=official-rin-portrait-2" alt="Rin official portrait" />
         </div>
         <div class="player-info">
           <div class="player-row">
@@ -142,8 +142,8 @@
             </section>
 
             <aside class="character-detail-panel">
-              <div class="character-portrait-wrap">
-                <img id="characterPortrait" src="assets/player/rin_portrait.png?v=official-rin-portrait" alt="Rin official normal portrait" />
+              <div class="character-portrait-wrap official-rin-portrait-wrap">
+                <img id="characterPortrait" class="official-rin-portrait" src="assets/player/rin_portrait.png?v=official-rin-portrait-2" alt="Rin official normal portrait" />
               </div>
               <div class="character-profile">
                 <div class="character-name-row">
@@ -227,6 +227,6 @@
     </div>
   </main>
 
-  <script src="game.js"></script>
+  <script src="game.js?v=official-rin-portrait-2"></script>
 </body>
 </html>
