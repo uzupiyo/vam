@@ -46,3 +46,10 @@ assets/
 - Items: グロー + 取得バースト
 
 詳細は `docs/EFFECTS.md` を確認してください。
+
+
+## 今回の更新：主人公Rin idleモーション反映
+
+- 主人公のゲーム内表示は `assets/player/rin/idle/frame_01.png` ～ `frame_04.png` を使用します。
+- `game.js` の `ASSET_PATHS.player.idle` で4枚を読み込み、`drawPlayer()` 内で待機モーションとしてアニメーション表示します。
+- Rinの正規デザインと透過PNG仕様を維持しています。
