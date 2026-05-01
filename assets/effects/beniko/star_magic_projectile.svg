@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 96" width="256" height="96">
+  <defs>
+    <filter id="glow" x="-40%" y="-80%" width="180%" height="260%">
+      <feGaussianBlur stdDeviation="3.2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <linearGradient id="trail" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#49e6ff" stop-opacity="0"/>
+      <stop offset="0.28" stop-color="#40cfff" stop-opacity="0.45"/>
+      <stop offset="0.7" stop-color="#1688ff" stop-opacity="0.82"/>
+      <stop offset="1" stop-color="#0654e8" stop-opacity="1"/>
+    </linearGradient>
+    <radialGradient id="starFill" cx="50%" cy="50%" r="60%">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.35" stop-color="#76f6ff"/>
+      <stop offset="0.72" stop-color="#139cff"/>
+      <stop offset="1" stop-color="#0539c9"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Beniko normal attack: blue pixel-digital star magic projectile. Direction: left -> right. -->
+  <g filter="url(#glow)">
+    <path d="M20 45 C58 37 86 41 126 45 C154 48 170 43 190 48" fill="none" stroke="url(#trail)" stroke-width="14" stroke-linecap="round" opacity="0.75"/>
+    <path d="M36 57 C72 55 104 59 138 56 C160 54 178 58 192 54" fill="none" stroke="#56e7ff" stroke-width="5" stroke-linecap="round" opacity="0.65"/>
+    <path d="M66 31 H105 M47 67 H95 M16 52 H50 M112 35 H154" stroke="#0a73ff" stroke-width="3" stroke-linecap="square" opacity="0.8"/>
+    <path d="M78 47 H135" stroke="#86ffff" stroke-width="2" stroke-linecap="square" opacity="0.75"/>
+
+    <g opacity="0.95">
+      <rect x="44" y="28" width="7" height="7" fill="#64f1ff"/>
+      <rect x="72" y="58" width="6" height="6" fill="#0a7bff"/>
+      <rect x="101" y="34" width="8" height="8" fill="#2fd8ff"/>
+      <rect x="126" y="61" width="5" height="5" fill="#0062ff"/>
+      <rect x="147" y="39" width="7" height="7" fill="#8efcff"/>
+      <rect x="166" y="58" width="4" height="4" fill="#0b47d8"/>
+    </g>
+
+    <circle cx="203" cy="48" r="30" fill="none" stroke="#45eaff" stroke-width="3" stroke-dasharray="8 5" opacity="0.9"/>
+    <circle cx="203" cy="48" r="22" fill="none" stroke="#0c65ff" stroke-width="3" opacity="0.95"/>
+    <path d="M203 13 L212 37 L238 37 L217 52 L226 78 L203 63 L180 78 L189 52 L168 37 L194 37 Z" fill="url(#starFill)" stroke="#ffffff" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M203 24 L209 41 L227 41 L212 52 L218 68 L203 58 L188 68 L194 52 L179 41 L197 41 Z" fill="none" stroke="#073bd8" stroke-width="4" stroke-linejoin="round" opacity="0.95"/>
+    <path d="M203 34 L207 45 L219 45 L209 52 L213 64 L203 57 L193 64 L197 52 L187 45 L199 45 Z" fill="#ffffff" opacity="0.92"/>
+
+    <path d="M203 6 V22 M203 74 V90 M161 48 H178 M228 48 H248" stroke="#7dfaff" stroke-width="4" stroke-linecap="round"/>
+    <path d="M150 26 h10 v10 h-10z M230 18 h7 v7 h-7z M238 66 h9 v9 h-9z M160 68 h6 v6 h-6z" fill="none" stroke="#119bff" stroke-width="2"/>
+    <path d="M154 52 l5 5 M154 57 l5 -5 M240 30 l5 5 M240 35 l5 -5" stroke="#8efcff" stroke-width="2" stroke-linecap="square"/>
+  </g>
+</svg>
