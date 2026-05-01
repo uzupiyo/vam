@@ -1,0 +1,29 @@
+/* Character select layout and pixel clarity fixes */
+html, body { width: 100%; min-height: 100%; }
+canvas, .character-cell img, .official-rin-portrait, .hud-rin-portrait { image-rendering: pixelated; image-rendering: crisp-edges; }
+.character-overlay { padding: 8px !important; align-items: center !important; justify-content: center !important; overflow: auto !important; }
+.character-select-screen { width: min(1020px, calc(100% - 12px)) !important; height: auto !important; max-height: calc(100% - 12px) !important; min-height: 0 !important; padding: 10px !important; display: grid !important; grid-template-rows: auto minmax(0, 1fr) !important; gap: 8px !important; overflow: auto !important; }
+.character-select-header { grid-template-columns: 104px minmax(0, 1fr) 104px !important; gap: 10px !important; margin: 0 !important; min-height: 48px !important; }
+.character-select-header h2 { font-size: clamp(18px, 3.8vh, 25px) !important; line-height: 1 !important; }
+.character-select-header p { font-size: 12px !important; margin-top: 3px !important; }
+.small-menu-button { min-height: 36px !important; font-size: 13px !important; }
+.character-select-body { min-height: 0 !important; overflow: visible !important; display: grid !important; grid-template-columns: minmax(360px, 1fr) minmax(260px, 310px) !important; gap: 10px !important; }
+.character-grid-panel, .character-detail-panel { min-height: 0 !important; overflow: hidden !important; }
+.character-grid-panel { padding: 10px !important; }
+.character-grid { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)) !important; grid-template-rows: repeat(3, minmax(72px, 1fr)) !important; gap: 8px !important; min-height: 0 !important; }
+.character-cell { aspect-ratio: auto !important; min-height: 72px !important; padding: 4px !important; border-radius: 12px !important; }
+.character-cell img { width: 64px !important; height: 64px !important; max-width: none !important; max-height: none !important; object-fit: contain !important; transform: translateY(-4px) !important; }
+.character-cell span:not(.question) { bottom: 4px !important; font-size: 11px !important; padding: 2px 5px !important; }
+.character-cell small { bottom: 6px !important; font-size: 9px !important; }
+.character-cell .question { font-size: clamp(26px, 5vh, 44px) !important; }
+.character-detail-panel { padding: 10px !important; grid-template-rows: minmax(210px, 1fr) auto !important; gap: 8px !important; }
+.character-portrait-wrap { min-height: 210px !important; }
+.character-portrait-wrap img, .official-rin-portrait { width: 100% !important; height: 100% !important; object-fit: contain !important; object-position: center bottom !important; }
+.character-profile { padding: 8px !important; }
+.character-name-row { margin-bottom: 5px !important; }
+.character-name-row h3 { font-size: 20px !important; }
+.character-profile p { font-size: 11px !important; line-height: 1.3 !important; margin-bottom: 6px !important; }
+.character-stats { gap: 4px !important; }
+.character-stats div { padding: 5px 7px !important; font-size: 11px !important; }
+@media (max-height: 650px) { .character-overlay { align-items: flex-start !important; } .character-select-screen { max-height: none !important; margin: 8px 0 !important; } .character-select-body { grid-template-columns: minmax(350px, 1fr) minmax(230px, 280px) !important; } .character-grid { grid-template-rows: repeat(3, 70px) !important; } .character-detail-panel { grid-template-rows: 205px auto !important; } }
+@media (max-width: 900px) { body { overflow: auto !important; } .character-overlay { align-items: flex-start !important; } .character-select-screen { width: 100% !important; max-height: none !important; overflow: visible !important; } .character-select-header, .character-select-body { grid-template-columns: 1fr !important; } .character-grid { grid-template-rows: repeat(3, 92px) !important; } .character-cell img { width: 72px !important; height: 72px !important; } .character-detail-panel { grid-template-rows: 300px auto !important; } }
