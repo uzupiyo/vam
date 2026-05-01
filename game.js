@@ -59,7 +59,7 @@ let assetsCompleted = 0;
 function updateAssetStatus() {
   if (!assetStatus) return;
   assetStatus.textContent = assetsLoaded
-    ? `ASSETS OK ${assetsCompleted}/${assetsExpected}`
+    ? `ASSETS OK ${assetsCompleted}/${assetsExpected} / RIN IDLE`
     : `ASSETS LOADING ${assetsCompleted}/${assetsExpected}`;
 }
 
@@ -100,7 +100,7 @@ function preloadAssets() {
 preloadAssets();
 
 const SPRITE_SIZES = {
-  player: { w: 74, h: 98 },
+  player: { w: 90, h: 120 },
   enemies: {
     slime: { w: 62, h: 50 },
     bat: { w: 76, h: 62 },
@@ -1174,7 +1174,7 @@ function drawPlayer() {
     ctx.strokeStyle = "#a855f7";
     ctx.lineWidth = 5;
     ctx.beginPath();
-    ctx.arc(p.x, p.y, 38, 0, Math.PI * 2);
+    ctx.arc(p.x, p.y, 42, 0, Math.PI * 2);
     ctx.stroke();
     ctx.globalAlpha = 1;
   }
@@ -1182,14 +1182,22 @@ function drawPlayer() {
 
   const size = SPRITE_SIZES.player;
   const bottomY = p.y + size.h * 0.44;
-  drawShadow(p.x, bottomY - 4, size.w * 0.64, size.h * 0.18, 0.3);
+  drawShadow(p.x, bottomY - 4, size.w * 0.66, size.h * 0.18, 0.3);
 
-  const frame = getAnimationFrame(images.player.idle, 4);
+  // FIXED: 主人公はRin idleの4フレームを直接使う。
+  // frame_01〜04を6fpsで切り替え、Canvas上のプレイヤー描画を旧図形から完全に置き換える。
+  const frame = getAnimationFrame(images.player.idle, 6);
   if (drawSpriteBottomCenter(frame, p.x, bottomY, size.w, size.h)) return;
 
-  // fallback
+  // 画像ロード失敗時だけのフォールバック。通常は表示されません。
+  ctx.save();
+  ctx.fillStyle = "#f6d365";
+  ctx.fillRect(p.x - 10, p.y - 22, 20, 16);
   ctx.fillStyle = "#38bdf8";
-  ctx.fillRect(p.x - 10, p.y - 12, 20, 24);
+  ctx.fillRect(p.x - 12, p.y - 6, 24, 30);
+  ctx.fillStyle = "#ef4444";
+  ctx.fillRect(p.x - 8, p.y - 8, 16, 4);
+  ctx.restore();
 }
 
 function drawEnemies() {
