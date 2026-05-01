@@ -4,15 +4,16 @@
   function tuneSprites() {
     try {
       if (typeof SPRITE !== 'undefined') {
+        // Stronger scale-down: about one third smaller than the previous tuned size.
         if (SPRITE.player) {
-          SPRITE.player.w = 64;
-          SPRITE.player.h = 84;
+          SPRITE.player.w = 44;
+          SPRITE.player.h = 58;
         }
         if (SPRITE.enemies) {
-          if (SPRITE.enemies.slime) { SPRITE.enemies.slime.w = 48; SPRITE.enemies.slime.h = 38; }
-          if (SPRITE.enemies.bat) { SPRITE.enemies.bat.w = 58; SPRITE.enemies.bat.h = 46; }
-          if (SPRITE.enemies.golem) { SPRITE.enemies.golem.w = 96; SPRITE.enemies.golem.h = 96; }
-          if (SPRITE.enemies.boss) { SPRITE.enemies.boss.w = 150; SPRITE.enemies.boss.h = 150; }
+          if (SPRITE.enemies.slime) { SPRITE.enemies.slime.w = 32; SPRITE.enemies.slime.h = 26; }
+          if (SPRITE.enemies.bat) { SPRITE.enemies.bat.w = 40; SPRITE.enemies.bat.h = 32; }
+          if (SPRITE.enemies.golem) { SPRITE.enemies.golem.w = 66; SPRITE.enemies.golem.h = 66; }
+          if (SPRITE.enemies.boss) { SPRITE.enemies.boss.w = 104; SPRITE.enemies.boss.h = 104; }
         }
       }
     } catch (e) {
@@ -29,8 +30,8 @@
 
   function tuneCharacterSelectDot() {
     document.querySelectorAll('.character-cell img').forEach(function (img) {
-      img.style.width = '60px';
-      img.style.height = '60px';
+      img.style.width = '52px';
+      img.style.height = '52px';
       img.style.maxWidth = 'none';
       img.style.maxHeight = 'none';
       img.style.objectFit = 'contain';
