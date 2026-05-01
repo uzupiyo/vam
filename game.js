@@ -57,9 +57,8 @@ let assetsExpected = 0;
 let assetsCompleted = 0;
 
 function updateAssetStatus() {
-  const statusEl = document.getElementById("assetStatus");
-  if (!statusEl) return;
-  statusEl.textContent = assetsLoaded
+  if (!assetStatus) return;
+  assetStatus.textContent = assetsLoaded
     ? `ASSETS OK ${assetsCompleted}/${assetsExpected}`
     : `ASSETS LOADING ${assetsCompleted}/${assetsExpected}`;
 }
@@ -241,8 +240,13 @@ const keys = new Set();
 window.addEventListener("keydown", (e) => {
   const key = e.key.toLowerCase();
 
-  if ([" ", "arrowup", "arrowdown", "arrowleft", "arrowright"].includes(key)) {
+  if ([" ", "arrowup", "arrowdown", "arrowleft", "arrowright", "enter"].includes(key)) {
     e.preventDefault();
+  }
+
+  if (key === "enter" && characterOverlay && characterOverlay.classList.contains("show")) {
+    startGame();
+    return;
   }
 
   if (key === " ") {
@@ -275,6 +279,7 @@ function createInitialGame() {
     cameraShake: 0,
     message: "",
     messageTimer: 0,
+    selectedCharacter,
     player: {
       x: W / 2,
       y: H / 2,
@@ -438,14 +443,25 @@ function selectCharacter(key) {
 }
 
 function startGame() {
+  // Character Select で選んだキャラを、操作キャラとしてゲーム本編へ渡します。
+  // 現在実装済みは Rin のみです。未実装枠は開始できません。
+  if (selectedCharacter !== "rin") selectedCharacter = "rin";
+
   game = createInitialGame();
   game.state = "playing";
+  game.selectedCharacter = selectedCharacter;
+
   if (SHOWCASE_ON_START) addShowcaseEntities();
-  titleOverlay.classList.remove("show");
-  resultOverlay.classList.remove("show");
-  levelOverlay.classList.remove("show");
-  pauseOverlay.classList.remove("show");
+
+  if (titleOverlay) titleOverlay.classList.remove("show");
+  if (characterOverlay) characterOverlay.classList.remove("show");
+  if (resultOverlay) resultOverlay.classList.remove("show");
+  if (levelOverlay) levelOverlay.classList.remove("show");
+  if (pauseOverlay) pauseOverlay.classList.remove("show");
+
+  keys.clear();
   lastTime = performance.now();
+  updateUI();
 }
 
 startButton.addEventListener("click", openCharacterSelect);
@@ -457,6 +473,13 @@ if (characterGrid) {
     const cell = event.target.closest(".character-cell");
     if (!cell || !cell.dataset.character) return;
     selectCharacter(cell.dataset.character);
+  });
+
+  characterGrid.addEventListener("dblclick", (event) => {
+    const cell = event.target.closest(".character-cell");
+    if (!cell || cell.dataset.character !== "rin") return;
+    selectCharacter("rin");
+    startGame();
   });
 }
 if (pauseButton) pauseButton.addEventListener("click", togglePause);
