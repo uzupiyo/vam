@@ -22,98 +22,76 @@ const W = canvas.width;
 const H = canvas.height;
 
 // ------------------------------
-// 画像アセット
+// 画像アセット読み込み
 // ------------------------------
-const SHOWCASE_ON_START = false;
-const PREVIEW_STATIC_MODE = false;
-
 const ASSET_PATHS = {
-  background: "assets/backgrounds/rin_city_plaza_field.png",
   player: {
-    idle: [
-      "assets/player/rin/idle/frame_01.png",
-      "assets/player/rin/idle/frame_02.png",
-      "assets/player/rin/idle/frame_03.png",
-      "assets/player/rin/idle/frame_04.png",
-    ],
+    rin: "assets/player/rin_spritesheet.png",
+    portrait: "assets/player/rin_portrait.png",
   },
   enemies: {
-    slime: ["assets/enemies/slime/frame_01.png", "assets/enemies/slime/frame_02.png"],
-    bat: ["assets/enemies/bat/frame_01.png", "assets/enemies/bat/frame_02.png"],
-    golem: ["assets/enemies/golem/frame_01.png", "assets/enemies/golem/frame_02.png"],
-    boss: ["assets/enemies/boss/frame_01.png", "assets/enemies/boss/frame_02.png"],
+    slime: "assets/enemies/slime_spritesheet.png",
+    bat: "assets/enemies/bat_spritesheet.png",
+    golem: "assets/enemies/golem_spritesheet.png",
+    boss: "assets/enemies/boss_spritesheet.png",
   },
   items: {
     magnet: "assets/items/magnet.png",
     heal: "assets/items/heal_cross.png",
-    barrier: "assets/items/barrier_shield.png",
-    weapon: "assets/items/rin_dual_pistols.png",
+    barrier: "assets/items/barrier.png",
+    gem: "assets/items/gem.png",
+  },
+  ui: {
+    hp: "assets/ui/icon_hp.png",
+    exp: "assets/ui/icon_exp.png",
+    weapon: "assets/ui/icon_weapon.png",
+    fire: "assets/ui/icon_fire.png",
+    lightning: "assets/ui/icon_lightning.png",
+  },
+  background: {
+    grid: "assets/background/grid_tile.png",
   },
 };
 
-const images = {};
-let assetsLoaded = false;
-let assetsExpected = 0;
-let assetsCompleted = 0;
+const IMAGES = {};
+let loadedImageCount = 0;
+let totalImageCount = 0;
 
-function updateAssetStatus() {
-  if (!assetStatus) return;
-  assetStatus.textContent = assetsLoaded
-    ? `ASSETS OK ${assetsCompleted}/${assetsExpected}`
-    : `ASSETS LOADING ${assetsCompleted}/${assetsExpected}`;
-}
-
-function loadImage(src) {
-  assetsExpected += 1;
-  const img = new Image();
-  img.onload = () => {
-    assetsCompleted += 1;
-    assetsLoaded = assetsCompleted >= assetsExpected;
-    updateAssetStatus();
-  };
-  img.onerror = () => {
-    assetsCompleted += 1;
-    console.warn("Asset failed:", src);
-    assetsLoaded = assetsCompleted >= assetsExpected;
-    updateAssetStatus();
-  };
-  img.src = src;
-  return img;
-}
-
-function preloadAssets() {
-  images.background = loadImage(ASSET_PATHS.background);
-  images.player = {
-    idle: ASSET_PATHS.player.idle.map(loadImage),
-  };
-  images.enemies = {};
-  for (const [key, paths] of Object.entries(ASSET_PATHS.enemies)) {
-    images.enemies[key] = paths.map(loadImage);
+function loadImageTree(source, target = IMAGES) {
+  for (const [key, value] of Object.entries(source)) {
+    if (typeof value === "string") {
+      totalImageCount += 1;
+      const img = new Image();
+      img.onload = () => { loadedImageCount += 1; };
+      img.onerror = () => { console.warn("画像を読み込めませんでした:", value); };
+      img.src = value;
+      target[key] = img;
+    } else {
+      target[key] = {};
+      loadImageTree(value, target[key]);
+    }
   }
-  images.items = {};
-  for (const [key, path] of Object.entries(ASSET_PATHS.items)) {
-    images.items[key] = loadImage(path);
-  }
-  updateAssetStatus();
+}
+loadImageTree(ASSET_PATHS);
+
+function imageReady(img) {
+  return img && img.complete && img.naturalWidth > 0;
 }
 
-preloadAssets();
+function drawImageCentered(img, x, y, w, h) {
+  if (!imageReady(img)) return false;
+  ctx.drawImage(img, Math.round(x - w / 2), Math.round(y - h / 2), Math.round(w), Math.round(h));
+  return true;
+}
 
-const SPRITE_SIZES = {
-  player: { w: 74, h: 98 },
-  enemies: {
-    slime: { w: 62, h: 50 },
-    bat: { w: 76, h: 62 },
-    golem: { w: 124, h: 124 },
-    boss: { w: 196, h: 196 },
-  },
-  items: {
-    magnet: { w: 54, h: 54 },
-    heal: { w: 54, h: 54 },
-    barrier: { w: 58, h: 58 },
-    weapon: { w: 54, h: 54 },
-  },
-};
+function drawSpriteFrame(img, frame, frameCount, x, y, w, h) {
+  if (!imageReady(img)) return false;
+  const fw = img.naturalWidth / frameCount;
+  const fh = img.naturalHeight;
+  const sx = Math.floor(frame % frameCount) * fw;
+  ctx.drawImage(img, sx, 0, fw, fh, Math.round(x - w / 2), Math.round(y - h / 2), Math.round(w), Math.round(h));
+  return true;
+}
 
 
 // ------------------------------
@@ -127,28 +105,8 @@ const levelText = document.getElementById("levelText");
 const timeText = document.getElementById("timeText");
 const killText = document.getElementById("killText");
 const barrierText = document.getElementById("barrierText");
-const expFillMini = document.getElementById("expFillMini");
-const goldText = document.getElementById("goldText");
-const pauseButton = document.getElementById("pauseButton");
-const missionTime = document.getElementById("missionTime");
-const missionTimeFill = document.getElementById("missionTimeFill");
-const missionExp = document.getElementById("missionExp");
-const missionExpFill = document.getElementById("missionExpFill");
-const missionBoss = document.getElementById("missionBoss");
-const missionBossFill = document.getElementById("missionBossFill");
-const statAttack = document.getElementById("statAttack");
-const statBarrier = document.getElementById("statBarrier");
-const statSpeed = document.getElementById("statSpeed");
-const statLuck = document.getElementById("statLuck");
-const slotKnife = document.getElementById("slotKnife");
-const slotFire = document.getElementById("slotFire");
-const slotLightning = document.getElementById("slotLightning");
 
 const titleOverlay = document.getElementById("titleOverlay");
-const characterOverlay = document.getElementById("characterOverlay");
-const backToTitleButton = document.getElementById("backToTitleButton");
-const confirmCharacterButton = document.getElementById("confirmCharacterButton");
-const characterGrid = document.getElementById("characterGrid");
 const levelOverlay = document.getElementById("levelOverlay");
 const pauseOverlay = document.getElementById("pauseOverlay");
 const resultOverlay = document.getElementById("resultOverlay");
@@ -158,7 +116,6 @@ const upgradeList = document.getElementById("upgradeList");
 
 const startButton = document.getElementById("startButton");
 const retryButton = document.getElementById("retryButton");
-const assetStatus = document.getElementById("assetStatus");
 
 // ------------------------------
 // ゲーム調整値
@@ -249,6 +206,16 @@ window.addEventListener("keydown", (e) => {
     return;
   }
 
+  if (key === "t") {
+    spawnDebugItems();
+    return;
+  }
+
+  if (key === "y") {
+    spawnDebugEffects();
+    return;
+  }
+
   keys.add(key);
 });
 
@@ -261,7 +228,6 @@ window.addEventListener("keyup", (e) => {
 // ------------------------------
 let game;
 let lastTime = 0;
-let selectedCharacter = "rin";
 
 function createInitialGame() {
   return {
@@ -270,7 +236,6 @@ function createInitialGame() {
     spawnTimer: 0,
     bossSpawned: false,
     kills: 0,
-    gold: 0,
     cameraShake: 0,
     message: "",
     messageTimer: 0,
@@ -370,76 +335,18 @@ const UPGRADE_POOL = [
   },
 ];
 
-
-function addShowcaseEntities() {
-  // 素材反映確認用：開始直後に4敵と3アイテムを見える位置に固定配置します。
-  game.enemies.length = 0;
-  game.items.length = 0;
-  game.gems.length = 0;
-  game.projectiles.length = 0;
-
-  game.player.x = W / 2;
-  game.player.y = H / 2 + 35;
-
-  const makeEnemy = (typeKey, x, y) => {
-    const t = ENEMY_TYPES[typeKey];
-    return {
-      typeKey, name: t.name, x, y, radius: t.radius,
-      hp: t.hp, maxHp: t.hp, speed: 0, damage: t.damage,
-      exp: t.exp, score: t.score, color: t.color, hitFlash: 0,
-    };
-  };
-
-  game.enemies.push(makeEnemy("slime", W / 2 - 210, H / 2 + 120));
-  game.enemies.push(makeEnemy("bat", W / 2 - 225, H / 2 - 120));
-  game.enemies.push(makeEnemy("golem", W / 2 + 170, H / 2 - 105));
-  game.enemies.push(makeEnemy("boss", W / 2 + 235, H / 2 + 145));
-
-  game.items.push({ typeKey: "magnet", name: ITEM_TYPES.magnet.name, x: W / 2 - 80, y: H / 2 + 145, radius: ITEM_TYPES.magnet.radius, bob: 0, life: 9999 });
-  game.items.push({ typeKey: "heal", name: ITEM_TYPES.heal.name, x: W / 2, y: H / 2 + 145, radius: ITEM_TYPES.heal.radius, bob: 1, life: 9999 });
-  game.items.push({ typeKey: "barrier", name: ITEM_TYPES.barrier.name, x: W / 2 + 80, y: H / 2 + 145, radius: ITEM_TYPES.barrier.radius, bob: 2, life: 9999 });
-}
-
 // ------------------------------
 // 初期化・開始・リトライ
 // ------------------------------
 function init() {
   game = createInitialGame();
-  titleOverlay.classList.add("show");
-  if (characterOverlay) characterOverlay.classList.remove("show");
   updateUI();
   draw();
-}
-
-
-function openCharacterSelect() {
-  if (!game) game = createInitialGame();
-  game.state = "title";
-  titleOverlay.classList.remove("show");
-  resultOverlay.classList.remove("show");
-  levelOverlay.classList.remove("show");
-  pauseOverlay.classList.remove("show");
-  if (characterOverlay) characterOverlay.classList.add("show");
-}
-
-function backToTitle() {
-  if (characterOverlay) characterOverlay.classList.remove("show");
-  titleOverlay.classList.add("show");
-}
-
-function selectCharacter(key) {
-  if (key !== "rin") return;
-  selectedCharacter = key;
-  if (!characterGrid) return;
-  for (const cell of characterGrid.querySelectorAll(".character-cell")) {
-    cell.classList.toggle("selected", cell.dataset.character === key);
-  }
 }
 
 function startGame() {
   game = createInitialGame();
   game.state = "playing";
-  if (SHOWCASE_ON_START) addShowcaseEntities();
   titleOverlay.classList.remove("show");
   resultOverlay.classList.remove("show");
   levelOverlay.classList.remove("show");
@@ -447,18 +354,8 @@ function startGame() {
   lastTime = performance.now();
 }
 
-startButton.addEventListener("click", openCharacterSelect);
+startButton.addEventListener("click", startGame);
 retryButton.addEventListener("click", startGame);
-if (confirmCharacterButton) confirmCharacterButton.addEventListener("click", startGame);
-if (backToTitleButton) backToTitleButton.addEventListener("click", backToTitle);
-if (characterGrid) {
-  characterGrid.addEventListener("click", (event) => {
-    const cell = event.target.closest(".character-cell");
-    if (!cell || !cell.dataset.character) return;
-    selectCharacter(cell.dataset.character);
-  });
-}
-if (pauseButton) pauseButton.addEventListener("click", togglePause);
 
 // ------------------------------
 // 一時停止
@@ -501,14 +398,14 @@ function update(dt) {
   if (game.messageTimer <= 0) game.message = "";
 
   updatePlayer(dt);
-  if (!PREVIEW_STATIC_MODE) spawnEnemies(dt);
+  spawnEnemies(dt);
   updateEnemies(dt);
   updateAttacks(dt);
   updateProjectiles(dt);
   updateGems(dt);
   updateItems(dt);
   updateEffects(dt);
-  if (!PREVIEW_STATIC_MODE) checkPlayerDamage();
+  checkPlayerDamage();
   checkClearOrGameOver();
   updateUI();
 }
@@ -796,7 +693,6 @@ function removeDeadEnemies() {
     const e = game.enemies[i];
     if (e.hp <= 0) {
       game.kills += e.score;
-      game.gold += e.score * 3;
       dropGem(e.x, e.y, e.exp);
       tryDropItem(e.x, e.y, e.typeKey);
       game.effects.push({
@@ -923,6 +819,24 @@ function showMessage(text) {
   game.messageTimer = 1.5;
 }
 
+
+function spawnDebugItems() {
+  if (!game || game.state !== "playing") return;
+  const p = game.player;
+  dropItem("magnet", clamp(p.x - 54, 30, W - 30), clamp(p.y - 22, 30, H - 30));
+  dropItem("heal", clamp(p.x, 30, W - 30), clamp(p.y - 58, 30, H - 30));
+  dropItem("barrier", clamp(p.x + 54, 30, W - 30), clamp(p.y - 22, 30, H - 30));
+  showMessage("アイテム3種を出しました");
+}
+
+function spawnDebugEffects() {
+  if (!game || game.state !== "playing") return;
+  const p = game.player;
+  game.effects.push({ type: "circle", x: p.x, y: p.y, radius: 82, life: 0.45, maxLife: 0.45, color: "#f97316" });
+  game.effects.push({ type: "lightning", x: clamp(p.x + 90, 80, W - 80), y: clamp(p.y - 30, 80, H - 80), radius: 28, life: 0.45, maxLife: 0.45, color: "#facc15" });
+  showMessage("炎・雷エフェクト確認");
+}
+
 function gainExp(value) {
   const p = game.player;
   p.exp += value;
@@ -1043,36 +957,15 @@ function updateUI() {
 
   const hpRate = clamp(p.hp / p.maxHp, 0, 1) * 100;
   const expRate = clamp(p.exp / p.nextExp, 0, 1) * 100;
-  const timeRate = clamp(game.elapsed / CLEAR_TIME, 0, 1) * 100;
-  const bossRate = game.bossSpawned ? 100 : 0;
 
   hpFill.style.width = `${hpRate}%`;
   expFill.style.width = `${expRate}%`;
-  if (expFillMini) expFillMini.style.width = `${expRate}%`;
-
   hpLabel.textContent = `HP ${Math.ceil(p.hp)} / ${p.maxHp}`;
   expLabel.textContent = `EXP ${Math.floor(p.exp)} / ${p.nextExp}`;
   levelText.textContent = `Lv.${p.level}`;
   timeText.textContent = formatTime(game.elapsed);
   killText.textContent = `KILL ${game.kills}`;
-  if (goldText) goldText.textContent = `GOLD ${game.gold || 0}`;
   if (barrierText) barrierText.textContent = p.barrierTime > 0 ? `BARRIER ${p.barrierTime.toFixed(1)}` : "BARRIER -";
-
-  if (missionTime) missionTime.textContent = `${formatTime(game.elapsed)} / 10:00`;
-  if (missionTimeFill) missionTimeFill.style.width = `${timeRate}%`;
-  if (missionExp) missionExp.textContent = `${Math.floor(p.exp)} / ${p.nextExp}`;
-  if (missionExpFill) missionExpFill.style.width = `${expRate}%`;
-  if (missionBoss) missionBoss.textContent = `${game.bossSpawned ? 1 : 0} / 1`;
-  if (missionBossFill) missionBossFill.style.width = `${bossRate}%`;
-
-  if (statAttack) statAttack.textContent = p.knifeLevel;
-  if (statBarrier) statBarrier.textContent = Math.floor(p.barrierBonus);
-  if (statSpeed) statSpeed.textContent = (p.speed / 190).toFixed(2);
-  if (statLuck) statLuck.textContent = `${Math.min(99, Math.floor((p.pickupRange - 42) / 2))}%`;
-
-  if (slotKnife) slotKnife.textContent = `Lv.${p.knifeLevel} ${"★".repeat(Math.min(5, p.knifeLevel))}`;
-  if (slotFire) slotFire.textContent = `Lv.${p.fireLevel} ${p.fireLevel > 0 ? "★".repeat(Math.min(5, p.fireLevel)) : "☆"}`;
-  if (slotLightning) slotLightning.textContent = `Lv.${p.lightningLevel} ${p.lightningLevel > 0 ? "★".repeat(Math.min(5, p.lightningLevel)) : "☆"}`;
 }
 
 // ------------------------------
@@ -1104,146 +997,114 @@ function draw() {
 }
 
 function drawBackground() {
-  const bg = images.background;
-  if (bg && bg.complete && bg.naturalWidth > 0) {
-    ctx.drawImage(bg, 0, 0, W, H);
-    ctx.fillStyle = "rgba(4, 10, 24, 0.08)";
-    ctx.fillRect(0, 0, W, H);
-    return;
+  ctx.fillStyle = "#0f172a";
+  ctx.fillRect(0, 0, W, H);
+
+  const tile = IMAGES.background && IMAGES.background.grid;
+  if (imageReady(tile)) {
+    for (let x = 0; x < W; x += tile.naturalWidth) {
+      for (let y = 0; y < H; y += tile.naturalHeight) {
+        ctx.drawImage(tile, x, y);
+      }
+    }
   }
 
-  ctx.fillStyle = "#172033";
+  const grad = ctx.createRadialGradient(W * 0.52, H * 0.42, 80, W * 0.52, H * 0.42, Math.max(W, H));
+  grad.addColorStop(0, "rgba(34, 211, 238, 0.12)");
+  grad.addColorStop(0.55, "rgba(236, 72, 153, 0.07)");
+  grad.addColorStop(1, "rgba(2, 6, 23, 0.45)");
+  ctx.fillStyle = grad;
   ctx.fillRect(0, 0, W, H);
-  ctx.fillStyle = "#c9bda7";
-  ctx.fillRect(100, 60, W - 200, H - 120);
-}
-
-function drawTree(x, y) {
-  ctx.fillStyle = "#5b361d";
-  ctx.fillRect(x - 5, y + 20, 10, 22);
-  ctx.fillStyle = "#2f7d32";
-  ctx.fillRect(x - 22, y - 8, 44, 34);
-  ctx.fillStyle = "#62b83e";
-  ctx.fillRect(x - 15, y - 18, 30, 18);
-}
-
-function drawBench(x, y) {
-  ctx.fillStyle = "#2b1d16";
-  ctx.fillRect(x, y + 12, 78, 6);
-  ctx.fillStyle = "#9f5a2e";
-  ctx.fillRect(x + 4, y, 70, 8);
-  ctx.fillRect(x + 4, y + 10, 70, 8);
-}
-
-
-function getAnimationFrame(frameList, fps = 4) {
-  if (!frameList || frameList.length === 0) return null;
-  const index = Math.floor(game.elapsed * fps) % frameList.length;
-  const img = frameList[index];
-  return img && img.complete && img.naturalWidth > 0 ? img : null;
-}
-
-function drawSpriteBottomCenter(img, x, bottomY, w, h) {
-  if (!img || !img.complete || img.naturalWidth <= 0) return false;
-  ctx.drawImage(img, x - w / 2, bottomY - h, w, h);
-  return true;
-}
-
-function drawSpriteCenter(img, x, y, w, h) {
-  if (!img || !img.complete || img.naturalWidth <= 0) return false;
-  ctx.drawImage(img, x - w / 2, y - h / 2, w, h);
-  return true;
-}
-
-function drawShadow(x, y, w, h, alpha = 0.28) {
-  ctx.save();
-  ctx.globalAlpha = alpha;
-  ctx.fillStyle = "#000000";
-  ctx.beginPath();
-  ctx.ellipse(x, y, w / 2, h / 2, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.restore();
 }
 
 function drawPlayer() {
   const p = game.player;
   const blink = p.invincibleTime > 0 && Math.floor(performance.now() / 80) % 2 === 0;
-
   if (p.barrierTime > 0) {
     ctx.globalAlpha = 0.35 + Math.sin(performance.now() / 120) * 0.12;
     ctx.strokeStyle = "#a855f7";
     ctx.lineWidth = 5;
     ctx.beginPath();
-    ctx.arc(p.x, p.y, 38, 0, Math.PI * 2);
+    ctx.arc(p.x, p.y, 31, 0, Math.PI * 2);
     ctx.stroke();
     ctx.globalAlpha = 1;
   }
   if (blink) return;
 
-  const size = SPRITE_SIZES.player;
-  const bottomY = p.y + size.h * 0.44;
-  drawShadow(p.x, bottomY - 4, size.w * 0.64, size.h * 0.18, 0.3);
+  ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
+  ctx.beginPath();
+  ctx.ellipse(p.x, p.y + 25, 19, 7, 0, 0, Math.PI * 2);
+  ctx.fill();
 
-  const frame = getAnimationFrame(images.player.idle, 4);
-  if (drawSpriteBottomCenter(frame, p.x, bottomY, size.w, size.h)) return;
+  const moving = keys.has("w") || keys.has("a") || keys.has("s") || keys.has("d") || keys.has("arrowup") || keys.has("arrowdown") || keys.has("arrowleft") || keys.has("arrowright");
+  const frame = moving ? Math.floor(performance.now() / 140) % 4 : Math.floor(performance.now() / 420) % 4;
+  if (drawSpriteFrame(IMAGES.player.rin, frame, 4, p.x, p.y + 2, 64, 64)) return;
 
-  // fallback
   ctx.fillStyle = "#38bdf8";
   ctx.fillRect(p.x - 10, p.y - 12, 20, 24);
+  ctx.fillStyle = "#e0f2fe";
+  ctx.fillRect(p.x - 5, p.y - 18, 10, 8);
+  ctx.fillStyle = "#0f172a";
+  ctx.fillRect(p.x - 5, p.y - 5, 4, 4);
+  ctx.fillRect(p.x + 2, p.y - 5, 4, 4);
 }
 
 function drawEnemies() {
   for (const e of game.enemies) {
-    const size = SPRITE_SIZES.enemies[e.typeKey] || { w: e.radius * 3, h: e.radius * 3 };
-    const bottomY = e.y + size.h * 0.42;
+    ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
+    ctx.beginPath();
+    ctx.ellipse(e.x, e.y + e.radius * 0.92, e.radius * 1.05, Math.max(5, e.radius * 0.32), 0, 0, Math.PI * 2);
+    ctx.fill();
 
-    const shadowAlpha = e.typeKey === "bat" ? 0.16 : e.typeKey === "boss" ? 0.34 : 0.28;
-    drawShadow(e.x, bottomY - 4, size.w * 0.62, size.h * 0.17, shadowAlpha);
-
-    const frames = images.enemies[e.typeKey];
-    const frame = getAnimationFrame(frames, e.typeKey === "bat" ? 6 : 3);
-    if (e.hitFlash > 0) {
-      ctx.save();
-      ctx.globalAlpha = 0.55;
-      ctx.fillStyle = "#ffffff";
-      ctx.beginPath();
-      ctx.arc(e.x, e.y, Math.max(size.w, size.h) * 0.28, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    }
-
-    const drew = drawSpriteBottomCenter(frame, e.x, bottomY, size.w, size.h);
-    if (!drew) {
+    const frame = Math.floor(performance.now() / 320) % 2;
+    const enemyImage = IMAGES.enemies[e.typeKey];
+    const size = e.typeKey === "boss" ? 96 : Math.max(42, e.radius * 3.3);
+    const didDraw = drawSpriteFrame(enemyImage, frame, 2, e.x, e.y, size, size);
+    if (!didDraw) {
       ctx.fillStyle = e.hitFlash > 0 ? "#ffffff" : e.color;
       ctx.fillRect(e.x - e.radius, e.y - e.radius, e.radius * 2, e.radius * 2);
+      ctx.fillStyle = "#020617";
+      ctx.fillRect(e.x - e.radius * 0.45, e.y - e.radius * 0.2, 4, 4);
+      ctx.fillRect(e.x + e.radius * 0.2, e.y - e.radius * 0.2, 4, 4);
+    }
+
+    if (e.hitFlash > 0) {
+      ctx.globalAlpha = 0.45;
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(e.x - e.radius, e.y - e.radius, e.radius * 2, e.radius * 2);
+      ctx.globalAlpha = 1;
     }
 
     const hpRate = clamp(e.hp / e.maxHp, 0, 1);
-    const hpW = Math.max(24, size.w * 0.52);
-    ctx.fillStyle = "rgba(17, 24, 39, 0.82)";
-    ctx.fillRect(e.x - hpW / 2, e.y - size.h * 0.48 - 10, hpW, 4);
+    ctx.fillStyle = "#111827";
+    ctx.fillRect(e.x - e.radius, e.y - e.radius - 12, e.radius * 2, 4);
     ctx.fillStyle = "#ef4444";
-    ctx.fillRect(e.x - hpW / 2, e.y - size.h * 0.48 - 10, hpW * hpRate, 4);
+    ctx.fillRect(e.x - e.radius, e.y - e.radius - 12, e.radius * 2 * hpRate, 4);
   }
 }
 
 function drawProjectiles() {
   for (const b of game.projectiles) {
-    ctx.fillStyle = b.color;
-    ctx.fillRect(b.x - 8, b.y - 3, 16, 6);
-
-    ctx.fillStyle = "#94a3b8";
-    ctx.fillRect(b.x - 2, b.y - 2, 10, 4);
+    const angle = Math.atan2(b.vy, b.vx);
+    ctx.save();
+    ctx.translate(b.x, b.y);
+    ctx.rotate(angle);
+    ctx.fillStyle = "#0f172a";
+    ctx.fillRect(-9, -4, 18, 8);
+    ctx.fillStyle = "#e5e7eb";
+    ctx.fillRect(-7, -3, 14, 6);
+    ctx.fillStyle = "#facc15";
+    ctx.fillRect(4, -2, 5, 4);
+    ctx.restore();
   }
 }
 
 function drawGems() {
   for (const g of game.gems) {
     const bobY = Math.sin(g.bob) * 2;
-
+    if (drawImageCentered(IMAGES.items.gem, g.x, g.y + bobY, 24, 24)) continue;
     ctx.fillStyle = "#22d3ee";
     ctx.fillRect(g.x - 5, g.y - 5 + bobY, 10, 10);
-
     ctx.fillStyle = "#cffafe";
     ctx.fillRect(g.x - 2, g.y - 7 + bobY, 4, 4);
   }
@@ -1252,13 +1113,14 @@ function drawGems() {
 function drawItems() {
   for (const item of game.items) {
     const bobY = Math.sin(item.bob) * 3;
-    const img = images.items[item.typeKey];
-    const size = SPRITE_SIZES.items[item.typeKey] || { w: 34, h: 34 };
-
     ctx.save();
     ctx.translate(item.x, item.y + bobY);
-    drawShadow(0, size.h * 0.34, size.w * 0.52, size.h * 0.16, 0.2);
-    if (!drawSpriteCenter(img, 0, 0, size.w, size.h)) {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
+    ctx.beginPath();
+    ctx.ellipse(0, 17, 14, 5, 0, 0, Math.PI * 2);
+    ctx.fill();
+    const img = IMAGES.items[item.typeKey];
+    if (!drawImageCentered(img, 0, 0, 38, 38)) {
       const type = ITEM_TYPES[item.typeKey];
       if (item.typeKey === "magnet") drawMagnetItem(type.color);
       else if (item.typeKey === "heal") drawHealItem(type.color);
@@ -1267,36 +1129,9 @@ function drawItems() {
     ctx.restore();
   }
 }
-
-function drawMagnetItem(color) {
-  ctx.fillStyle = "#0f172a";
-  ctx.fillRect(-12, -12, 24, 24);
-  ctx.fillStyle = color;
-  ctx.fillRect(-10, -10, 7, 18);
-  ctx.fillRect(3, -10, 7, 18);
-  ctx.fillRect(-10, 5, 20, 5);
-}
-
-function drawHealItem(color) {
-  ctx.fillStyle = "#f8fafc";
-  ctx.fillRect(-12, -12, 24, 24);
-  ctx.fillStyle = color;
-  ctx.fillRect(-4, -9, 8, 18);
-  ctx.fillRect(-9, -4, 18, 8);
-}
-
-function drawBarrierItem(color) {
-  ctx.fillStyle = color;
-  ctx.beginPath();
-  ctx.moveTo(0, -14);
-  ctx.lineTo(12, -8);
-  ctx.lineTo(9, 8);
-  ctx.lineTo(0, 15);
-  ctx.lineTo(-9, 8);
-  ctx.lineTo(-12, -8);
-  ctx.closePath();
-  ctx.fill();
-}
+function drawMagnetItem(color) { ctx.fillStyle = "#0f172a"; ctx.fillRect(-12, -12, 24, 24); ctx.fillStyle = color; ctx.fillRect(-10, -10, 7, 18); ctx.fillRect(3, -10, 7, 18); ctx.fillRect(-10, 5, 20, 5); ctx.fillStyle = "#e0f2fe"; ctx.fillRect(-10, -10, 7, 4); ctx.fillRect(3, -10, 7, 4); }
+function drawHealItem(color) { ctx.fillStyle = "#f8fafc"; ctx.fillRect(-12, -12, 24, 24); ctx.strokeStyle = "#7f1d1d"; ctx.strokeRect(-12, -12, 24, 24); ctx.fillStyle = color; ctx.fillRect(-4, -9, 8, 18); ctx.fillRect(-9, -4, 18, 8); }
+function drawBarrierItem(color) { ctx.fillStyle = "#0f172a"; ctx.beginPath(); ctx.moveTo(0, -14); ctx.lineTo(12, -8); ctx.lineTo(9, 8); ctx.lineTo(0, 15); ctx.lineTo(-9, 8); ctx.lineTo(-12, -8); ctx.closePath(); ctx.fill(); ctx.fillStyle = color; ctx.beginPath(); ctx.moveTo(0, -11); ctx.lineTo(9, -6); ctx.lineTo(7, 7); ctx.lineTo(0, 12); ctx.lineTo(-7, 7); ctx.lineTo(-9, -6); ctx.closePath(); ctx.fill(); ctx.fillStyle = "#f5d0fe"; ctx.fillRect(-2, -7, 4, 13); }
 
 function drawEffects() {
   for (const ef of game.effects) {
@@ -1343,44 +1178,31 @@ function drawEffects() {
 }
 
 function drawWeaponInfo() {
-  // Small canvas-side sprite preview to confirm item assets are active.
-  const weapon = images.items.weapon;
-  if (weapon && weapon.complete && weapon.naturalWidth > 0) {
-    ctx.save();
-    ctx.globalAlpha = 0.9;
-    ctx.fillStyle = "rgba(2, 6, 23, 0.55)";
-    ctx.fillRect(14, H - 58, 54, 44);
-    drawSpriteCenter(weapon, 42, H - 36, 38, 38);
-    ctx.restore();
-  }
+  const p = game.player;
+  ctx.fillStyle = "rgba(2, 6, 23, 0.74)";
+  ctx.fillRect(12, H - 108, 336, 88);
+  ctx.strokeStyle = "#ec4899";
+  ctx.strokeRect(12, H - 108, 336, 88);
+
+  const rows = [
+    { icon: IMAGES.ui.weapon, text: `Knife Lv.${p.knifeLevel}` },
+    { icon: IMAGES.ui.fire, text: `Fire Lv.${p.fireLevel}` },
+    { icon: IMAGES.ui.lightning, text: `Lightning Lv.${p.lightningLevel}` },
+    { icon: IMAGES.items.magnet, text: `Items: Magnet / Heal / Barrier` },
+  ];
+  ctx.fillStyle = "#e5e7eb";
+  ctx.font = "14px Courier New";
+  rows.forEach((row, i) => {
+    const x = i < 2 ? 28 : 170;
+    const y = i % 2 === 0 ? H - 78 : H - 42;
+    drawImageCentered(row.icon, x, y - 4, 22, 22);
+    ctx.fillText(row.text, x + 18, y);
+  });
 }
 
 function drawMessage() {
   if (!game.message || game.messageTimer <= 0) return;
   ctx.save(); ctx.globalAlpha = clamp(game.messageTimer, 0, 1); ctx.fillStyle = "rgba(2, 6, 23, 0.78)"; ctx.fillRect(W / 2 - 130, 70, 260, 42); ctx.strokeStyle = "#facc15"; ctx.strokeRect(W / 2 - 130, 70, 260, 42); ctx.fillStyle = "#facc15"; ctx.font = "bold 20px Courier New"; ctx.textAlign = "center"; ctx.fillText(game.message, W / 2, 98); ctx.restore();
-}
-
-
-function spawnDebugItems() {
-  if (!game || !game.player) return;
-  const p = game.player;
-  dropItem("magnet", clamp(p.x - 90, 40, W - 40), clamp(p.y + 70, 40, H - 40));
-  dropItem("heal", clamp(p.x, 40, W - 40), clamp(p.y + 70, 40, H - 40));
-  dropItem("barrier", clamp(p.x + 90, 40, W - 40), clamp(p.y + 70, 40, H - 40));
-  showMessage("ITEM TEST");
-}
-
-function triggerDebugEffects() {
-  if (!game || !game.player) return;
-  const oldFire = game.player.fireLevel;
-  const oldLightning = game.player.lightningLevel;
-  game.player.fireLevel = Math.max(2, game.player.fireLevel);
-  game.player.lightningLevel = Math.max(2, game.player.lightningLevel);
-  useFireAura();
-  useLightning();
-  game.player.fireLevel = oldFire;
-  game.player.lightningLevel = oldLightning;
-  showMessage("EFFECT TEST");
 }
 
 // ------------------------------

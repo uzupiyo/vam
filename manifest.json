@@ -1,41 +1,41 @@
 {
-  "package": "rin_game_all_assets_integrated",
-  "base": "rin_game_effects_ready",
-  "assets_integrated": {
+  "title": "RIN SURVIVORS image integrated build",
+  "structure": "GitHub Pages ready: index.html/style.css/game.js/assets/ at repository root",
+  "assets": {
     "player": [
-      "assets/player/rin/idle/frame_01.png ... frame_04.png",
-      "assets/characters/rin/portrait.png"
+      "rin_spritesheet.png",
+      "rin_portrait.png"
     ],
     "enemies": [
-      "slime",
-      "bat",
-      "golem",
-      "boss"
+      "slime_spritesheet.png",
+      "bat_spritesheet.png",
+      "golem_spritesheet.png",
+      "boss_spritesheet.png"
     ],
-    "items": {
-      "magnet": "assets/items/magnet.png",
-      "heal": "assets/items/heal_cross.png",
-      "barrier": "assets/items/barrier_shield.png",
-      "weapon": "assets/items/rin_dual_pistols.png"
-    },
-    "background": "assets/backgrounds/rin_city_plaza_field.png",
-    "source_item_sheet": "assets/items/source_sheet/items_sheet_transparent.png"
+    "items": [
+      "magnet.png",
+      "heal_cross.png",
+      "barrier.png",
+      "gem.png"
+    ],
+    "ui": [
+      "icon_hp.png",
+      "icon_exp.png",
+      "icon_weapon.png",
+      "icon_fire.png",
+      "icon_lightning.png"
+    ],
+    "background": [
+      "grid_tile.png"
+    ]
   },
-  "debug_keys": {
-    "T": "spawn items",
-    "Y": "trigger fire/lightning effects"
-  },
-  "notes": [
-    "Flat GitHub Pages-ready structure",
-    "Item assets use latest green-chroma-key transparent output"
+  "controls": [
+    "WASD/Arrow: move",
+    "Space: pause",
+    "T: spawn 3 items",
+    "Y: spawn fire/lightning effects"
   ],
-  "latest_item_assets_present": {
-    "magnet.png": true,
-    "heal_cross.png": true,
-    "barrier_shield.png": true,
-    "rin_dual_pistols.png": true
-  },
-  "missing_refs": [
-    "assets/items/source_sheet/items_sheet_transparent.png"
+  "notes": [
+    "magnet was generated as a matching transparent pixel-art asset because the previous item pack did not include a dedicated magnet icon."
   ]
 }
