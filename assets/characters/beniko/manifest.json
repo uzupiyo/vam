@@ -1,0 +1,46 @@
+{
+  "id": "beniko",
+  "display_name": "Beniko",
+  "order": 2,
+  "role": "controller_mage",
+  "status": "in_progress",
+  "design": {
+    "base": "red-pink fox girl with blue star-like eyes, fox ears, black bows, large red fox tail, pink cropped hoodie, black inner top, black high-waisted shorts, and black boots",
+    "portrait": "Use the finalized splash-art portrait as-is; transparency processing is deferred.",
+    "hair": "Back hair ends use a moderated outward-flip silhouette.",
+    "eyes": "Blue eyes with light-aqua star detail near the pupil."
+  },
+  "weapon": {
+    "id": "game_controller",
+    "display_name": "Game Controller",
+    "concept": "Beniko uses a game controller as a magical casting medium."
+  },
+  "normal_attack": {
+    "id": "star_magic",
+    "display_name": "Star Magic",
+    "description": "Fires a blue star-shaped energy projectile.",
+    "projectile_asset": "assets/effects/beniko/star_magic_projectile.svg",
+    "selected_design": "second projectile concept recolored to a blue/cyan palette"
+  },
+  "assets": {
+    "dot": "assets/characters/beniko/dot.png",
+    "portrait": "assets/characters/beniko/portrait.png",
+    "idle_gif": "assets/characters/beniko/idle.gif",
+    "idle_frames": "assets/player/beniko/idle/frame_01.png ... frame_04.png"
+  },
+  "animation": {
+    "idle": {
+      "approved": true,
+      "source": "Beniko idle variant 2 with centered frames, full tail visible, body parts restored, top/hair-tail holes fixed, eyes restored.",
+      "frames": 4,
+      "duration_ms": 220,
+      "loop": true,
+      "alignment": "Rin-like shared canvas, centered body, stable feet/body center, no baked shadow"
+    }
+  },
+  "notes": [
+    "Beniko is the second character after Rin.",
+    "Normal attack is controller-cast blue star magic, not firearm-based.",
+    "Use transparent PNG workflow for sprites; shadows are game-side only."
+  ]
+}
