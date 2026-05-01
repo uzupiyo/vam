@@ -112,6 +112,58 @@
         </div>
       </div>
 
+
+      <div id="characterOverlay" class="overlay character-overlay">
+        <div class="character-select-screen ui-panel">
+          <div class="character-select-header">
+            <button id="backToTitleButton" class="small-menu-button" type="button">← Title</button>
+            <div>
+              <h2>CHARACTER SELECT</h2>
+              <p>Choose your survivor</p>
+            </div>
+            <button id="confirmCharacterButton" class="small-menu-button primary" type="button">Start</button>
+          </div>
+
+          <div class="character-select-body">
+            <section class="character-grid-panel">
+              <div id="characterGrid" class="character-grid">
+                <button class="character-cell selected" data-character="rin" type="button">
+                  <img src="assets/player/rin/idle/frame_01.png" alt="Rin dot" />
+                  <span>Rin</span>
+                </button>
+                <button class="character-cell locked" type="button"><span class="question">?</span><small>Coming Soon</small></button>
+                <button class="character-cell locked" type="button"><span class="question">?</span><small>Coming Soon</small></button>
+                <button class="character-cell locked" type="button"><span class="question">?</span><small>Coming Soon</small></button>
+                <button class="character-cell locked" type="button"><span class="question">?</span><small>Coming Soon</small></button>
+                <button class="character-cell locked" type="button"><span class="question">?</span><small>Coming Soon</small></button>
+                <button class="character-cell locked" type="button"><span class="question">?</span><small>Coming Soon</small></button>
+                <button class="character-cell locked" type="button"><span class="question">?</span><small>Coming Soon</small></button>
+                <button class="character-cell locked" type="button"><span class="question">?</span><small>Coming Soon</small></button>
+              </div>
+            </section>
+
+            <aside class="character-detail-panel">
+              <div class="character-portrait-wrap">
+                <img id="characterPortrait" src="assets/characters/rin/portrait.png" alt="Rin portrait" />
+              </div>
+              <div class="character-profile">
+                <div class="character-name-row">
+                  <h3 id="characterName">Rin</h3>
+                  <span id="characterVersion">Normal</span>
+                </div>
+                <p id="characterDesc">Dual-pistol survivor with balanced speed and stable firepower.</p>
+                <div class="character-stats">
+                  <div><span>HP</span><b>100</b></div>
+                  <div><span>Speed</span><b>Normal</b></div>
+                  <div><span>Weapon</span><b>Dual Pistols</b></div>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </div>
+
+
       <div id="levelOverlay" class="overlay level-overlay">
         <div class="panel level-panel ui-panel">
           <h2>LEVEL UP!</h2>

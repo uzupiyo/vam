@@ -1,27 +1,35 @@
-# Rin Game Set - Transparent Items Integrated
+# RIN SURVIVORS - All Assets Integrated Test
 
-このセットは、ゲームプロジェクトに今回のアイテム画像を反映した版です。
+現時点の素材を一旦すべてゲームに組み込んだ確認版です。
 
-## 反映済みアイテム
+## 入っているもの
 
-- `assets/items/magnet.png`
-- `assets/items/heal_cross.png`
-- `assets/items/barrier_shield.png`
-- `assets/items/rin_dual_pistols.png`
+- タイトル画面
+- キャラクター選択画面
+- Rin 通常ドット
+- Rin 立ち絵
+- 敵4種
+- 背景
+- 最新アイテム3種（緑背景クロマキー済み）
+- Rin武器アイコン
+- 炎・雷・銃撃・取得エフェクト
 
-## アイテム仕様
+## 起動
 
-- 本番用PNGは 256x256
-- 透過PNG
-- 中心配置
-- デザインはOKをもらったアイテムを基準
-- 市松模様は本番PNGには含めていません
+`index.html` を開いてください。
 
-## 透過確認
+## 確認用ページ
 
-`assets/items_transparency_preview.png` は確認用です。
-市松模様はこの確認用画像にだけ入っています。
+`asset_preview.html` で全素材のパスと透過状態を確認できます。
 
-## 実行
+## テスト操作
 
-`index.html` または `index_inline.html` を開いて確認してください。
+ゲーム中:
+
+- `T`: アイテム3種をプレイヤー近くに出す
+- `Y`: 炎・雷エフェクトを出す
+- `Space`: 一時停止
+
+## GitHub Pages
+
+ZIPの中身をリポジトリ直下に置いてください。

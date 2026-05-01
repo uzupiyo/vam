@@ -1,0 +1,41 @@
+{
+  "package": "rin_game_all_assets_integrated",
+  "base": "rin_game_effects_ready",
+  "assets_integrated": {
+    "player": [
+      "assets/player/rin/idle/frame_01.png ... frame_04.png",
+      "assets/characters/rin/portrait.png"
+    ],
+    "enemies": [
+      "slime",
+      "bat",
+      "golem",
+      "boss"
+    ],
+    "items": {
+      "magnet": "assets/items/magnet.png",
+      "heal": "assets/items/heal_cross.png",
+      "barrier": "assets/items/barrier_shield.png",
+      "weapon": "assets/items/rin_dual_pistols.png"
+    },
+    "background": "assets/backgrounds/rin_city_plaza_field.png",
+    "source_item_sheet": "assets/items/source_sheet/items_sheet_transparent.png"
+  },
+  "debug_keys": {
+    "T": "spawn items",
+    "Y": "trigger fire/lightning effects"
+  },
+  "notes": [
+    "Flat GitHub Pages-ready structure",
+    "Item assets use latest green-chroma-key transparent output"
+  ],
+  "latest_item_assets_present": {
+    "magnet.png": true,
+    "heal_cross.png": true,
+    "barrier_shield.png": true,
+    "rin_dual_pistols.png": true
+  },
+  "missing_refs": [
+    "assets/items/source_sheet/items_sheet_transparent.png"
+  ]
+}

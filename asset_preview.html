@@ -2,28 +2,35 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>Asset Preview</title>
+<title>RIN All Assets Preview</title>
 <style>
-body{background:#0b1220;color:#fff;font-family:monospace;padding:20px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px}
-.card{background:#152238;border:1px solid #39d9ff;border-radius:12px;padding:12px;text-align:center}
-.card img{max-width:120px;max-height:120px;image-rendering:pixelated;background:#20304a}
-.bg img{max-width:320px;max-height:180px}
+body{margin:0;background:#07111f;color:#fff;font-family:monospace;padding:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px}
+.card{background:#13233b;border:1px solid #36d9ff;border-radius:12px;padding:12px;text-align:center}
+.card img{max-width:128px;max-height:128px;image-rendering:pixelated}
+.checker{display:grid;place-items:center;min-height:150px;background:
+linear-gradient(45deg,#ddd 25%,transparent 25%),linear-gradient(-45deg,#ddd 25%,transparent 25%),
+linear-gradient(45deg,transparent 75%,#ddd 75%),linear-gradient(-45deg,transparent 75%,#ddd 75%);
+background-color:#fff;background-size:24px 24px;background-position:0 0,0 12px,12px -12px,-12px 0}
+.wide img{max-width:320px;max-height:180px}
 </style>
 </head>
 <body>
-<h1>RIN SURVIVORS Asset Preview</h1>
+<h1>RIN All Assets Preview</h1>
+<p>ここで画像が見えれば、ゲーム内の相対パスは通っています。</p>
 <div class="grid">
-<div class="card"><h3>Rin</h3><img src="assets/player/rin/idle/frame_01.png"></div>
-<div class="card"><h3>slime</h3><img src="assets/enemies/slime/frame_01.png"></div>
-<div class="card"><h3>bat</h3><img src="assets/enemies/bat/frame_01.png"></div>
-<div class="card"><h3>golem</h3><img src="assets/enemies/golem/frame_01.png"></div>
-<div class="card"><h3>boss</h3><img src="assets/enemies/boss/frame_01.png"></div>
-<div class="card"><h3>magnet</h3><img src="assets/items/magnet.png"></div>
-<div class="card"><h3>heal</h3><img src="assets/items/heal_cross.png"></div>
-<div class="card"><h3>barrier</h3><img src="assets/items/barrier_shield.png"></div>
-<div class="card"><h3>weapon</h3><img src="assets/items/rin_dual_pistols.png"></div>
-<div class="card bg"><h3>background</h3><img src="assets/backgrounds/rin_city_plaza_field.png"></div>
+<div class="card"><h3>Rin dot</h3><div class="checker"><img src="assets/player/rin/idle/frame_01.png"></div></div>
+<div class="card"><h3>Rin portrait</h3><div class="checker"><img src="assets/characters/rin/portrait.png"></div></div>
+<div class="card"><h3>slime</h3><div class="checker"><img src="assets/enemies/slime/frame_01.png"></div></div>
+<div class="card"><h3>bat</h3><div class="checker"><img src="assets/enemies/bat/frame_01.png"></div></div>
+<div class="card"><h3>golem</h3><div class="checker"><img src="assets/enemies/golem/frame_01.png"></div></div>
+<div class="card"><h3>boss</h3><div class="checker"><img src="assets/enemies/boss/frame_01.png"></div></div>
+<div class="card"><h3>magnet latest</h3><div class="checker"><img src="assets/items/magnet.png"></div></div>
+<div class="card"><h3>heal potion latest</h3><div class="checker"><img src="assets/items/heal_cross.png"></div></div>
+<div class="card"><h3>barrier latest</h3><div class="checker"><img src="assets/items/barrier_shield.png"></div></div>
+<div class="card"><h3>weapon</h3><div class="checker"><img src="assets/items/rin_dual_pistols.png"></div></div>
+<div class="card wide"><h3>background</h3><div class="checker"><img src="assets/backgrounds/rin_city_plaza_field.png"></div></div>
+<div class="card wide"><h3>item sheet transparent</h3><div class="checker"><img src="assets/items/source_sheet/items_sheet_transparent.png"></div></div>
 </div>
 </body>
 </html>
