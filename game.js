@@ -57,8 +57,9 @@ let assetsExpected = 0;
 let assetsCompleted = 0;
 
 function updateAssetStatus() {
-  if (!assetStatus) return;
-  assetStatus.textContent = assetsLoaded
+  const statusEl = document.getElementById("assetStatus");
+  if (!statusEl) return;
+  statusEl.textContent = assetsLoaded
     ? `ASSETS OK ${assetsCompleted}/${assetsExpected}`
     : `ASSETS LOADING ${assetsCompleted}/${assetsExpected}`;
 }
@@ -100,8 +101,7 @@ function preloadAssets() {
 preloadAssets();
 
 const SPRITE_SIZES = {
-  // 主人公は assets/player/rin/idle/frame_01.png〜frame_04.png をゲーム内で使います。
-  player: { w: 84, h: 112 },
+  player: { w: 74, h: 98 },
   enemies: {
     slime: { w: 62, h: 50 },
     bat: { w: 76, h: 62 },
@@ -1185,16 +1185,12 @@ function drawPlayer() {
   const bottomY = p.y + size.h * 0.44;
   drawShadow(p.x, bottomY - 4, size.w * 0.64, size.h * 0.18, 0.3);
 
-  const frame = getAnimationFrame(images.player.idle, 6);
+  const frame = getAnimationFrame(images.player.idle, 4);
   if (drawSpriteBottomCenter(frame, p.x, bottomY, size.w, size.h)) return;
 
-  // 画像が読み込めなかった時だけのフォールバック。通常はRin idle画像が表示されます。
-  ctx.fillStyle = "#f6d365";
-  ctx.fillRect(p.x - 10, p.y - 22, 20, 16);
+  // fallback
   ctx.fillStyle = "#38bdf8";
-  ctx.fillRect(p.x - 12, p.y - 6, 24, 30);
-  ctx.fillStyle = "#ef4444";
-  ctx.fillRect(p.x - 8, p.y - 8, 16, 4);
+  ctx.fillRect(p.x - 10, p.y - 12, 20, 24);
 }
 
 function drawEnemies() {

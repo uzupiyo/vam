@@ -46,11 +46,3 @@ assets/
 - Items: グロー + 取得バースト
 
 詳細は `docs/EFFECTS.md` を確認してください。
-
-
-## 2026-05-01 修正メモ
-
-- 画面遷移・UI・キャラクター選択画面は `final_game_files_latest.zip` のまま維持。
-- 変更箇所は `game.js` の主人公描画のみ。
-- 主人公は `assets/player/rin/idle/frame_01.png`〜`frame_04.png` を6fpsで表示。
-- ブラウザキャッシュ対策として `index.html` の `game.js` 読み込みにバージョンを付与。
