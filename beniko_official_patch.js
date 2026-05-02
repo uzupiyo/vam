@@ -1,6 +1,6 @@
-/* Clean Beniko integration patch - approved assets marker */
+/* Beniko official patch - display and runtime sprite fix */
 (function () {
-  const VERSION = 'beniko-approved-strict-2';
+  const VERSION = 'beniko-display-fix-1';
   const BENIKO = {
     id: 'beniko',
     name: 'Beniko',
@@ -9,7 +9,12 @@
     weapon: 'Game Controller',
     dot: `assets/characters/beniko/dot.png?v=${VERSION}`,
     portrait: `assets/characters/beniko/portrait.jpg?v=${VERSION}`,
-    idle: `assets/characters/beniko/idle.gif?v=${VERSION}`,
+    idleFrames: [
+      `assets/characters/beniko/dot.png?v=${VERSION}`,
+      `assets/characters/beniko/dot.png?v=${VERSION}`,
+      `assets/characters/beniko/dot.png?v=${VERSION}`,
+      `assets/characters/beniko/dot.png?v=${VERSION}`,
+    ],
     spriteW: 58,
     spriteH: 58,
   };
@@ -27,6 +32,7 @@
   };
 
   let rinIdleFrames = null;
+  let benikoIdleFrames = null;
 
   function setImage(img, src, label) {
     if (!img) return;
@@ -37,6 +43,9 @@
     img.style.visibility = 'visible';
     img.style.opacity = '1';
     img.style.objectFit = 'contain';
+    img.style.objectPosition = 'center center';
+    img.style.width = '100%';
+    img.style.height = '100%';
   }
 
   function currentId() {
@@ -69,7 +78,11 @@
     cell.classList.remove('locked');
     cell.dataset.character = 'beniko';
     cell.innerHTML = '<img alt="Beniko dot" /><span>Beniko</span>';
-    setImage(cell.querySelector('img'), BENIKO.dot, 'Beniko dot');
+    const img = cell.querySelector('img');
+    setImage(img, BENIKO.dot, 'Beniko dot');
+    img.style.maxWidth = '86%';
+    img.style.maxHeight = '86%';
+    img.style.margin = 'auto';
   }
 
   function renderCharacterDetail(id) {
@@ -77,7 +90,13 @@
     document.querySelectorAll('#characterGrid .character-cell').forEach((cell) => {
       if (cell.dataset.character) cell.classList.toggle('selected', cell.dataset.character === id);
     });
-    setImage(document.getElementById('characterPortrait'), data.portrait, `${data.name} portrait`);
+    const portrait = document.getElementById('characterPortrait');
+    setImage(portrait, data.portrait, `${data.name} portrait`);
+    if (id === 'beniko') {
+      portrait.style.objectFit = 'contain';
+      portrait.style.width = '100%';
+      portrait.style.height = '100%';
+    }
     const name = document.getElementById('characterName');
     const version = document.getElementById('characterVersion');
     const desc = document.getElementById('characterDesc');
@@ -97,12 +116,14 @@
   }
 
   function makeBenikoIdleFrames() {
-    return [0, 1, 2, 3].map(() => {
+    if (benikoIdleFrames) return benikoIdleFrames;
+    benikoIdleFrames = BENIKO.idleFrames.map((src, idx) => {
       const img = new Image();
-      img.onerror = () => console.error('[BenikoPatch] failed to load Beniko idle:', BENIKO.idle);
-      img.src = BENIKO.idle;
+      img.onerror = () => console.error(`[BenikoPatch] failed to load Beniko sprite ${idx + 1}:`, src);
+      img.src = src;
       return img;
     });
+    return benikoIdleFrames;
   }
 
   function applyRuntimeCharacter() {
@@ -172,6 +193,7 @@
       if (id === 'beniko' || id === 'rin') return selectCharacterClean(id);
       return originalSelect?.(id);
     };
+
     const originalStart = typeof startGame === 'function' ? startGame : null;
     startGame = function patchedStartGame() {
       const chosen = currentId();
@@ -182,6 +204,7 @@
       applyRuntimeCharacter();
       try { updateUI(); } catch (error) {}
     };
+
     const originalFireKnife = typeof fireKnife === 'function' ? fireKnife : null;
     fireKnife = function patchedFireKnife() {
       if (getCurrentCharacter().id !== 'beniko') return originalFireKnife?.();
@@ -195,6 +218,7 @@
         game.projectiles.push({ type: 'starMagic', x: p.x, y: p.y - 12, vx: Math.cos(a) * 390, vy: Math.sin(a) * 390, radius: 10, damage, life: 1.15, pierce: Math.floor(p.knifeLevel / 3), angle: a, spin: Math.random() * Math.PI * 2 });
       }
     };
+
     const originalDrawProjectiles = typeof drawProjectiles === 'function' ? drawProjectiles : null;
     drawProjectiles = function patchedDrawProjectiles() {
       const projectiles = game?.projectiles || [];
@@ -206,6 +230,7 @@
       game.projectiles = originalList;
       for (const star of stars) drawStarProjectile(star);
     };
+
     const originalUpdateUI = typeof updateUI === 'function' ? updateUI : null;
     updateUI = function patchedUpdateUI() {
       originalUpdateUI?.();
