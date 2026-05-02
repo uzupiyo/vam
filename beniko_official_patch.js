@@ -1,6 +1,6 @@
-/* Clean Beniko integration patch - official assets only */
+/* Clean Beniko integration patch - approved assets marker */
 (function () {
-  const VERSION = 'beniko-official-clean-1';
+  const VERSION = 'beniko-approved-strict-1';
   const BENIKO = {
     id: 'beniko',
     name: 'Beniko',
@@ -9,6 +9,7 @@
     weapon: 'Game Controller',
     dot: `assets/characters/beniko/dot.png?v=${VERSION}`,
     portrait: `assets/characters/beniko/portrait.png?v=${VERSION}`,
+    idle: `assets/characters/beniko/idle.gif?v=${VERSION}`,
     spriteW: 58,
     spriteH: 58,
   };
@@ -35,14 +36,16 @@
     img.style.display = 'block';
     img.style.visibility = 'visible';
     img.style.opacity = '1';
+    img.style.objectFit = 'contain';
+  }
+
+  function currentId() {
+    try { return selectedCharacter || window.selectedCharacter || 'rin'; }
+    catch (error) { return window.selectedCharacter || 'rin'; }
   }
 
   function getCurrentCharacter() {
-    try {
-      return selectedCharacter === 'beniko' ? BENIKO : RIN;
-    } catch (error) {
-      return window.selectedCharacter === 'beniko' ? BENIKO : RIN;
-    }
+    return currentId() === 'beniko' ? BENIKO : RIN;
   }
 
   function setSelectedCharacter(id) {
@@ -53,7 +56,6 @@
   function ensureBenikoCell() {
     const grid = document.getElementById('characterGrid');
     if (!grid) return;
-
     let cell = grid.querySelector('[data-character="beniko"]');
     if (!cell) {
       cell = document.createElement('button');
@@ -64,7 +66,6 @@
       if (firstLocked) firstLocked.replaceWith(cell);
       else grid.appendChild(cell);
     }
-
     cell.classList.remove('locked');
     cell.dataset.character = 'beniko';
     cell.innerHTML = '<img alt="Beniko dot" /><span>Beniko</span>';
@@ -73,18 +74,14 @@
 
   function renderCharacterDetail(id) {
     const data = id === 'beniko' ? BENIKO : RIN;
-
     document.querySelectorAll('#characterGrid .character-cell').forEach((cell) => {
       if (cell.dataset.character) cell.classList.toggle('selected', cell.dataset.character === id);
     });
-
     setImage(document.getElementById('characterPortrait'), data.portrait, `${data.name} portrait`);
-
     const name = document.getElementById('characterName');
     const version = document.getElementById('characterVersion');
     const desc = document.getElementById('characterDesc');
     const stats = document.querySelectorAll('.character-stats > div b');
-
     if (name) name.textContent = data.name;
     if (version) version.textContent = data.version;
     if (desc) desc.textContent = data.desc;
@@ -102,8 +99,8 @@
   function makeBenikoIdleFrames() {
     return [0, 1, 2, 3].map(() => {
       const img = new Image();
-      img.onerror = () => console.error('[BenikoPatch] failed to load Beniko gameplay sprite:', BENIKO.dot);
-      img.src = BENIKO.dot;
+      img.onerror = () => console.error('[BenikoPatch] failed to load Beniko idle:', BENIKO.idle);
+      img.src = BENIKO.idle;
       return img;
     });
   }
@@ -111,7 +108,6 @@
   function applyRuntimeCharacter() {
     const data = getCurrentCharacter();
     if (!rinIdleFrames && Array.isArray(images?.playerIdle)) rinIdleFrames = [...images.playerIdle];
-
     try {
       if (data.id === 'beniko') {
         images.playerIdle = makeBenikoIdleFrames();
@@ -140,7 +136,6 @@
     ctx.translate(b.x, b.y);
     ctx.rotate(b.angle || 0);
     ctx.globalCompositeOperation = 'lighter';
-
     const trail = ctx.createLinearGradient(-34, 0, 8, 0);
     trail.addColorStop(0, 'rgba(73,230,255,0)');
     trail.addColorStop(0.4, 'rgba(64,207,255,.5)');
@@ -151,7 +146,6 @@
     ctx.moveTo(-34, 0);
     ctx.lineTo(-7, 0);
     ctx.stroke();
-
     ctx.rotate((b.spin || 0) + performance.now() / 180);
     ctx.shadowColor = '#45eaff';
     ctx.shadowBlur = 12;
@@ -178,10 +172,9 @@
       if (id === 'beniko' || id === 'rin') return selectCharacterClean(id);
       return originalSelect?.(id);
     };
-
     const originalStart = typeof startGame === 'function' ? startGame : null;
     startGame = function patchedStartGame() {
-      const chosen = getCurrentCharacter().id;
+      const chosen = currentId();
       setSelectedCharacter(chosen);
       originalStart?.();
       setSelectedCharacter(chosen);
@@ -189,7 +182,6 @@
       applyRuntimeCharacter();
       try { updateUI(); } catch (error) {}
     };
-
     const originalFireKnife = typeof fireKnife === 'function' ? fireKnife : null;
     fireKnife = function patchedFireKnife() {
       if (getCurrentCharacter().id !== 'beniko') return originalFireKnife?.();
@@ -200,36 +192,20 @@
         const target = findNearestEnemy();
         let a = target ? Math.atan2(target.y - p.y, target.x - p.x) : -Math.PI / 2;
         a += (i - (count - 1) / 2) * 0.18;
-        game.projectiles.push({
-          type: 'starMagic',
-          x: p.x,
-          y: p.y - 12,
-          vx: Math.cos(a) * 390,
-          vy: Math.sin(a) * 390,
-          radius: 10,
-          damage,
-          life: 1.15,
-          pierce: Math.floor(p.knifeLevel / 3),
-          angle: a,
-          spin: Math.random() * Math.PI * 2,
-        });
+        game.projectiles.push({ type: 'starMagic', x: p.x, y: p.y - 12, vx: Math.cos(a) * 390, vy: Math.sin(a) * 390, radius: 10, damage, life: 1.15, pierce: Math.floor(p.knifeLevel / 3), angle: a, spin: Math.random() * Math.PI * 2 });
       }
     };
-
     const originalDrawProjectiles = typeof drawProjectiles === 'function' ? drawProjectiles : null;
     drawProjectiles = function patchedDrawProjectiles() {
       const projectiles = game?.projectiles || [];
       const stars = projectiles.filter((b) => b.type === 'starMagic');
       if (!stars.length) return originalDrawProjectiles?.();
-
       const originalList = game.projectiles;
       game.projectiles = projectiles.filter((b) => b.type !== 'starMagic');
       originalDrawProjectiles?.();
       game.projectiles = originalList;
-
       for (const star of stars) drawStarProjectile(star);
     };
-
     const originalUpdateUI = typeof updateUI === 'function' ? updateUI : null;
     updateUI = function patchedUpdateUI() {
       originalUpdateUI?.();
@@ -253,7 +229,6 @@
         selectCharacterClean(cell.dataset.character);
       }
     }, true);
-
     grid?.addEventListener('dblclick', (event) => {
       const cell = event.target.closest('.character-cell');
       if (cell?.dataset.character === 'beniko' || cell?.dataset.character === 'rin') {
@@ -263,7 +238,6 @@
         startGame();
       }
     }, true);
-
     document.getElementById('confirmCharacterButton')?.addEventListener('click', (event) => {
       event.preventDefault();
       event.stopImmediatePropagation();
@@ -275,7 +249,7 @@
     ensureBenikoCell();
     patchRuntimeFunctions();
     bindEvents();
-    renderCharacterDetail(getCurrentCharacter().id);
+    renderCharacterDetail(currentId());
     window.__benikoOfficialPatch = VERSION;
   }
 
