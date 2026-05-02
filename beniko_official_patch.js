@@ -1,6 +1,6 @@
 /* Clean Beniko integration patch - approved assets marker */
 (function () {
-  const VERSION = 'beniko-approved-strict-1';
+  const VERSION = 'beniko-approved-strict-2';
   const BENIKO = {
     id: 'beniko',
     name: 'Beniko',
@@ -8,7 +8,7 @@
     desc: 'ゲームコントローラーを媒体に、青い星形エネルギー弾を撃つ狐娘。',
     weapon: 'Game Controller',
     dot: `assets/characters/beniko/dot.png?v=${VERSION}`,
-    portrait: `assets/characters/beniko/portrait.png?v=${VERSION}`,
+    portrait: `assets/characters/beniko/portrait.jpg?v=${VERSION}`,
     idle: `assets/characters/beniko/idle.gif?v=${VERSION}`,
     spriteW: 58,
     spriteH: 58,
