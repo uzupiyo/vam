@@ -1,6 +1,6 @@
-/* Beniko official patch - full-body display fix */
+/* Beniko official patch - select dot cache fix */
 (function () {
-  const VERSION = 'beniko-fullbody-fix-1';
+  const VERSION = 'beniko-select-dot-fix-2';
   const BENIKO = {
     id: 'beniko',
     name: 'Beniko',
