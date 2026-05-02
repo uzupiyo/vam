@@ -1,6 +1,6 @@
-/* Beniko official patch - display and runtime sprite fix */
+/* Beniko official patch - full-body display fix */
 (function () {
-  const VERSION = 'beniko-display-fix-1';
+  const VERSION = 'beniko-fullbody-fix-1';
   const BENIKO = {
     id: 'beniko',
     name: 'Beniko',
@@ -10,10 +10,10 @@
     dot: `assets/characters/beniko/dot.png?v=${VERSION}`,
     portrait: `assets/characters/beniko/portrait.jpg?v=${VERSION}`,
     idleFrames: [
-      `assets/characters/beniko/dot.png?v=${VERSION}`,
-      `assets/characters/beniko/dot.png?v=${VERSION}`,
-      `assets/characters/beniko/dot.png?v=${VERSION}`,
-      `assets/characters/beniko/dot.png?v=${VERSION}`,
+      `assets/characters/beniko/idle.gif?v=${VERSION}`,
+      `assets/characters/beniko/idle.gif?v=${VERSION}`,
+      `assets/characters/beniko/idle.gif?v=${VERSION}`,
+      `assets/characters/beniko/idle.gif?v=${VERSION}`,
     ],
     spriteW: 58,
     spriteH: 58,
@@ -44,8 +44,6 @@
     img.style.opacity = '1';
     img.style.objectFit = 'contain';
     img.style.objectPosition = 'center center';
-    img.style.width = '100%';
-    img.style.height = '100%';
   }
 
   function currentId() {
@@ -82,6 +80,8 @@
     setImage(img, BENIKO.dot, 'Beniko dot');
     img.style.maxWidth = '86%';
     img.style.maxHeight = '86%';
+    img.style.width = '86%';
+    img.style.height = '86%';
     img.style.margin = 'auto';
   }
 
@@ -119,7 +119,7 @@
     if (benikoIdleFrames) return benikoIdleFrames;
     benikoIdleFrames = BENIKO.idleFrames.map((src, idx) => {
       const img = new Image();
-      img.onerror = () => console.error(`[BenikoPatch] failed to load Beniko sprite ${idx + 1}:`, src);
+      img.onerror = () => console.error(`[BenikoPatch] failed to load Beniko idle frame ${idx + 1}:`, src);
       img.src = src;
       return img;
     });
