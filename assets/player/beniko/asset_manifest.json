@@ -1,0 +1,15 @@
+{
+  "character": "beniko",
+  "official_asset_root": "assets/player/beniko",
+  "portrait": "assets/player/beniko/portrait.png",
+  "select_dot": "assets/player/beniko/idle/frame_01.png",
+  "select_dot_alias": "assets/player/beniko/dot.png",
+  "idle_gif": "assets/player/beniko/idle.gif",
+  "idle_frames": [
+    "assets/player/beniko/idle/frame_01.png",
+    "assets/player/beniko/idle/frame_02.png",
+    "assets/player/beniko/idle/frame_03.png",
+    "assets/player/beniko/idle/frame_04.png"
+  ],
+  "note": "Beniko character-related assets are managed under assets/player/beniko."
+}
