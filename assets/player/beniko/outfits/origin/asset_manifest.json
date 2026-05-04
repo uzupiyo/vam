@@ -1,0 +1,22 @@
+{
+  "character": "beniko",
+  "outfit": "origin",
+  "version": "beniko-outfits-1",
+  "official": true,
+  "assets": {
+    "portrait": "assets/player/beniko/outfits/origin/portrait.png",
+    "dot": "assets/player/beniko/outfits/origin/dot.png",
+    "idle": "assets/player/beniko/outfits/origin/idle.gif",
+    "idleFrames": [
+      "assets/player/beniko/outfits/origin/idle/frame_01.png",
+      "assets/player/beniko/outfits/origin/idle/frame_02.png",
+      "assets/player/beniko/outfits/origin/idle/frame_03.png",
+      "assets/player/beniko/outfits/origin/idle/frame_04.png"
+    ]
+  },
+  "notes": [
+    "Beniko origin ver official portrait uses the transparent PNG created from the adopted 02 design.",
+    "PNG assets must be RGBA with alpha and no baked checkerboard or solid background.",
+    "Use C on the character select screen to cycle Beniko outfits."
+  ]
+}
