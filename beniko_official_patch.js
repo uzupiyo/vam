@@ -1,6 +1,6 @@
 /* Beniko official patch - player asset layout */
 (function () {
-  const VERSION = 'beniko-player-assets-1';
+  const VERSION = 'beniko-player-assets-2';
   const BENIKO_BASE = 'assets/player/beniko';
   const BENIKO = {
     id: 'beniko',
