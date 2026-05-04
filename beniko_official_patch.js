@@ -1,15 +1,16 @@
-/* Beniko official patch - official portrait */
+/* Beniko official patch - player asset layout */
 (function () {
-  const VERSION = 'beniko-official-portrait-2';
+  const VERSION = 'beniko-player-assets-1';
+  const BENIKO_BASE = 'assets/player/beniko';
   const BENIKO = {
     id: 'beniko',
     name: 'Beniko',
     version: 'Star Mage',
     desc: 'ゲームコントローラーを媒体に、青い星形エネルギー弾を撃つ狐娘。',
     weapon: 'Game Controller',
-    dot: `assets/characters/beniko/dot.png?v=${VERSION}`,
-    portrait: `assets/characters/beniko/portrait.png?v=${VERSION}`,
-    idle: `assets/characters/beniko/idle.gif?v=${VERSION}`,
+    dot: `${BENIKO_BASE}/idle/frame_01.png?v=${VERSION}`,
+    portrait: `${BENIKO_BASE}/portrait.png?v=${VERSION}`,
+    idle: `${BENIKO_BASE}/idle.gif?v=${VERSION}`,
     spriteW: 58,
     spriteH: 58,
   };
