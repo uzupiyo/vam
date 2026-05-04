@@ -1,16 +1,32 @@
-/* Beniko official patch - player asset layout */
+/* Beniko official patch - player asset layout + outfit switching */
 (function () {
-  const VERSION = 'beniko-player-assets-3';
+  const VERSION = 'beniko-player-assets-4';
   const BENIKO_BASE = 'assets/player/beniko';
+  const BENIKO_OUTFIT_BASE = `${BENIKO_BASE}/outfits`;
+  const BENIKO_OUTFITS = [
+    {
+      id: 'normal',
+      label: 'Normal',
+      version: 'Star Mage',
+      portrait: `${BENIKO_BASE}/portrait.png?v=${VERSION}`,
+      dot: `${BENIKO_BASE}/dot.png?v=${VERSION}`,
+      idle: `${BENIKO_BASE}/idle.gif?v=${VERSION}`,
+    },
+    {
+      id: 'origin',
+      label: 'Origin',
+      version: 'Origin ver',
+      portrait: `${BENIKO_OUTFIT_BASE}/origin/portrait.png?v=${VERSION}`,
+      dot: `${BENIKO_BASE}/dot.png?v=${VERSION}`,
+      idle: `${BENIKO_BASE}/idle.gif?v=${VERSION}`,
+    },
+  ];
+  let benikoOutfitIndex = 0;
   const BENIKO = {
     id: 'beniko',
     name: 'Beniko',
-    version: 'Star Mage',
     desc: 'ゲームコントローラーを媒体に、青い星形エネルギー弾を撃つ狐娘。',
     weapon: 'Game Controller',
-    dot: `${BENIKO_BASE}/dot.png?v=${VERSION}`,
-    portrait: `${BENIKO_BASE}/portrait.png?v=${VERSION}`,
-    idle: `${BENIKO_BASE}/idle.gif?v=${VERSION}`,
     spriteW: 58,
     spriteH: 58,
   };
@@ -22,7 +38,21 @@
   };
   let rinIdleFrames = null;
   let benikoIdleFrames = null;
+  let benikoIdleSrc = null;
 
+  function currentBenikoOutfit() { return BENIKO_OUTFITS[benikoOutfitIndex] || BENIKO_OUTFITS[0]; }
+  function benikoData() {
+    const outfit = currentBenikoOutfit();
+    return {
+      ...BENIKO,
+      outfitId: outfit.id,
+      outfitLabel: outfit.label,
+      version: outfit.version,
+      dot: outfit.dot,
+      portrait: outfit.portrait,
+      idle: outfit.idle,
+    };
+  }
   function setImage(img, src, label) {
     if (!img) return;
     img.onerror = () => console.error(`[BenikoPatch] failed to load ${label}:`, src);
@@ -35,7 +65,7 @@
     img.style.objectPosition = 'center center';
   }
   function currentId() { try { return selectedCharacter || window.selectedCharacter || 'rin'; } catch (e) { return window.selectedCharacter || 'rin'; } }
-  function dataFor(id) { return id === 'beniko' ? BENIKO : RIN; }
+  function dataFor(id) { return id === 'beniko' ? benikoData() : RIN; }
   function currentData() { return dataFor(currentId()); }
   function setSelected(id) { try { selectedCharacter = id; } catch (e) {} window.selectedCharacter = id; }
 
@@ -53,9 +83,9 @@
     }
     cell.classList.remove('locked');
     cell.dataset.character = 'beniko';
-    cell.innerHTML = '<img alt="Beniko dot" /><span>Beniko</span>';
+    cell.innerHTML = '<img alt="Beniko dot" /><span>Beniko</span><small class="outfit-hint">C: outfit</small>';
     const img = cell.querySelector('img');
-    setImage(img, BENIKO.dot, 'Beniko dot');
+    setImage(img, benikoData().dot, 'Beniko dot');
     Object.assign(img.style, { maxWidth: '86%', maxHeight: '86%', width: '86%', height: '86%', margin: 'auto' });
   }
 
@@ -73,16 +103,29 @@
     const stats = document.querySelectorAll('.character-stats > div b');
     if (name) name.textContent = data.name;
     if (version) version.textContent = data.version;
-    if (desc) desc.textContent = data.desc;
+    if (desc) desc.textContent = id === 'beniko' ? `${data.desc} / 衣装: ${data.outfitLabel}` : data.desc;
     if (stats[0]) stats[0].textContent = '100';
     if (stats[1]) stats[1].textContent = 'Normal';
     if (stats[2]) stats[2].textContent = data.weapon;
   }
   function selectClean(id) { if (id !== 'beniko' && id !== 'rin') return; setSelected(id); renderDetail(id); }
 
+  function cycleBenikoOutfit() {
+    if (currentId() !== 'beniko') return;
+    benikoOutfitIndex = (benikoOutfitIndex + 1) % BENIKO_OUTFITS.length;
+    window.selectedBenikoOutfit = currentBenikoOutfit().id;
+    benikoIdleFrames = null;
+    benikoIdleSrc = null;
+    ensureBenikoCell();
+    renderDetail('beniko');
+    try { applyRuntime(); updateUI(); } catch(e) {}
+  }
+
   function makeBenikoIdleFrames() {
-    if (benikoIdleFrames) return benikoIdleFrames;
-    benikoIdleFrames = [0,1,2,3].map((_, i) => { const img = new Image(); img.onerror = () => console.error(`[BenikoPatch] failed to load Beniko idle ${i+1}`, BENIKO.idle); img.src = BENIKO.idle; return img; });
+    const data = benikoData();
+    if (benikoIdleFrames && benikoIdleSrc === data.idle) return benikoIdleFrames;
+    benikoIdleSrc = data.idle;
+    benikoIdleFrames = [0,1,2,3].map((_, i) => { const img = new Image(); img.onerror = () => console.error(`[BenikoPatch] failed to load Beniko idle ${i+1}`, data.idle); img.src = data.idle; return img; });
     return benikoIdleFrames;
   }
   function applyRuntime() {
@@ -115,7 +158,7 @@
     const originalSelect = typeof selectCharacter === 'function' ? selectCharacter : null;
     selectCharacter = function(id) { if (id === 'beniko' || id === 'rin') return selectClean(id); return originalSelect?.(id); };
     const originalStart = typeof startGame === 'function' ? startGame : null;
-    startGame = function() { const chosen = currentId(); setSelected(chosen); originalStart?.(); setSelected(chosen); try { game.selectedCharacter = chosen; } catch(e) {} applyRuntime(); try { updateUI(); } catch(e) {} };
+    startGame = function() { const chosen = currentId(); setSelected(chosen); originalStart?.(); setSelected(chosen); try { game.selectedCharacter = chosen; game.selectedBenikoOutfit = currentBenikoOutfit().id; } catch(e) {} applyRuntime(); try { updateUI(); } catch(e) {} };
     const originalFireKnife = typeof fireKnife === 'function' ? fireKnife : null;
     fireKnife = function() {
       if (currentData().id !== 'beniko') return originalFireKnife?.();
@@ -132,8 +175,9 @@
     const grid = document.getElementById('characterGrid');
     grid?.addEventListener('click', (event) => { const cell = event.target.closest('.character-cell'); if (cell?.dataset.character === 'beniko' || cell?.dataset.character === 'rin') { event.preventDefault(); event.stopImmediatePropagation(); selectClean(cell.dataset.character); } }, true);
     grid?.addEventListener('dblclick', (event) => { const cell = event.target.closest('.character-cell'); if (cell?.dataset.character === 'beniko' || cell?.dataset.character === 'rin') { event.preventDefault(); event.stopImmediatePropagation(); selectClean(cell.dataset.character); startGame(); } }, true);
+    document.addEventListener('keydown', (event) => { const characterOverlay = document.getElementById('characterOverlay'); const visible = characterOverlay && !characterOverlay.classList.contains('hidden') && getComputedStyle(characterOverlay).display !== 'none'; if (visible && event.key.toLowerCase() === 'c') { event.preventDefault(); cycleBenikoOutfit(); } }, true);
     document.getElementById('confirmCharacterButton')?.addEventListener('click', (event) => { event.preventDefault(); event.stopImmediatePropagation(); startGame(); }, true);
   }
-  function init() { ensureBenikoCell(); patchRuntime(); bindEvents(); renderDetail(currentId()); window.__benikoOfficialPatch = VERSION; }
+  function init() { ensureBenikoCell(); patchRuntime(); bindEvents(); renderDetail(currentId()); window.__benikoOfficialPatch = VERSION; window.cycleBenikoOutfit = cycleBenikoOutfit; }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
