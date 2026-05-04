@@ -1,9 +1,8 @@
 // VFX visibility tuning patch.
-// Works at canvas draw level, so it still applies even when game.js keeps state/functions private.
-// - Fire: smaller, softer, less obstructive.
+// - Fire: larger initial visual and hitbox aligned with rendered image.
 // - Lightning: records the strike and redraws a short afterimage so the falling animation is visible.
 (function () {
-  const VERSION = 'vfx-tuned-2';
+  const VERSION = 'fire-size-1';
   const fireSrcNeedle = '/assets/effects/fire_skill_strip.png';
   const lightningSrcNeedle = '/assets/effects/lightning_skill_strip.png';
 
@@ -34,11 +33,14 @@
     const [img, sx, sy, sw, sh, dx, dy, dw, dh] = args;
     const cx = dx + dw / 2;
     const cy = dy + dh / 2;
-    const tunedSize = Math.max(44, Math.min(dw, dh) * 0.78);
+
+    // Previous tuning shrank this to 78%. The requested change makes the
+    // initial flame visibly larger while keeping it soft enough not to hide enemies.
+    const tunedSize = Math.max(72, Math.min(dw, dh) * 1.05);
 
     ctx.save();
     ctx.imageSmoothingEnabled = false;
-    ctx.globalAlpha = Math.min(ctx.globalAlpha, 0.30);
+    ctx.globalAlpha = Math.min(ctx.globalAlpha, 0.36);
     originalDrawImage.call(
       ctx,
       img,
@@ -111,6 +113,49 @@
     return originalDrawImage.apply(this, arguments);
   };
 
+  function patchFireAuraHitbox() {
+    try {
+      if (typeof game === 'undefined' || typeof useFireAura === 'undefined') return false;
+      if (typeof distance !== 'function' || typeof damageEnemy !== 'function' || typeof removeDeadEnemies !== 'function') return false;
+
+      useFireAura = function () {
+        const p = game.player;
+        const level = Math.max(1, p.fireLevel || 1);
+
+        // Visual draw size in game.js, then drawSoftFire renders it at 105%.
+        // Hitbox is matched to the visible sprite, slightly inside the edge.
+        const drawSize = 92 + level * 12;
+        const visibleRadius = drawSize * 1.05 * 0.5;
+        const hitRadius = Math.round(visibleRadius * 0.9);
+        const damage = 10 + level * 4;
+
+        game.effects.push({
+          type: 'fireSkill',
+          x: p.x,
+          y: p.y,
+          hitRadius,
+          radius: hitRadius,
+          drawSize,
+          life: 0.82,
+          maxLife: 0.82,
+          opacity: 0.48,
+          color: '#f97316'
+        });
+
+        for (const e of game.enemies) {
+          if (distance(p.x, p.y, e.x, e.y) <= hitRadius + e.radius) {
+            damageEnemy(e, damage);
+          }
+        }
+        removeDeadEnemies();
+      };
+
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   function drawLightningAfterimages() {
     const ctx = getCanvasContext();
     const now = performance.now();
@@ -146,7 +191,6 @@
         );
         ctx.restore();
 
-        // Small impact sparkle so the strike point is visually anchored.
         ctx.save();
         ctx.globalAlpha = 0.55 * rate;
         ctx.fillStyle = '#67e8f9';
@@ -160,15 +204,23 @@
   }
 
   function startOverlayLoop() {
-    if (overlayLoopStarted) return;
-    overlayLoopStarted = true;
-    requestAnimationFrame(drawLightningAfterimages);
+    if (!overlayLoopStarted) {
+      overlayLoopStarted = true;
+      requestAnimationFrame(drawLightningAfterimages);
+    }
+
+    patchFireAuraHitbox();
+    let count = 0;
+    const id = setInterval(function () {
+      patchFireAuraHitbox();
+      count += 1;
+      if (count > 40) clearInterval(id);
+    }, 100);
   }
 
   window.addEventListener('load', startOverlayLoop);
   document.addEventListener('DOMContentLoaded', startOverlayLoop);
   setTimeout(startOverlayLoop, 250);
 
-  // Debug marker for cache confirmation.
   window.__rinVfxVisibilityPatch = VERSION;
 })();
