@@ -1,6 +1,7 @@
-/* Beniko outfit cache/path fix - forces Origin portrait cache refresh */
+/* Beniko outfit cache/path fix - forces Origin portrait and Beniko default dot cache refresh */
 (function () {
-  const CACHE = 'beniko-origin-v5';
+  const CACHE = 'beniko-default-dot-v1';
+  const BENIKO_DEFAULT_DOT = `assets/player/beniko/Beniko Default.png?v=${CACHE}`;
   const NORMAL = {
     id: 'normal',
     label: 'Normal',
@@ -30,6 +31,25 @@
     return outfits[outfitIndex] || NORMAL;
   }
 
+  function applyBenikoDefaultDot() {
+    const img = document.querySelector('#characterGrid .character-cell[data-character="beniko"] img');
+    if (!img) return;
+    img.onerror = () => console.error('[BenikoOutfitFix] failed to load Beniko default dot:', BENIKO_DEFAULT_DOT);
+    img.removeAttribute('srcset');
+    img.src = BENIKO_DEFAULT_DOT;
+    img.alt = 'Beniko default dot';
+    img.style.display = 'block';
+    img.style.visibility = 'visible';
+    img.style.opacity = '1';
+    img.style.objectFit = 'contain';
+    img.style.objectPosition = 'center center';
+    img.style.maxWidth = '86%';
+    img.style.maxHeight = '86%';
+    img.style.width = '86%';
+    img.style.height = '86%';
+    img.style.margin = 'auto';
+  }
+
   function setPortrait(src, label) {
     const portrait = document.getElementById('characterPortrait');
     if (!portrait) return;
@@ -47,6 +67,7 @@
   }
 
   function applyBenikoDetail() {
+    applyBenikoDefaultDot();
     if (selectedCharacterId() !== 'beniko') return;
     const outfit = currentOutfit();
     setPortrait(outfit.portrait, outfit.label);
@@ -76,6 +97,7 @@
 
   function bind() {
     const grid = document.getElementById('characterGrid');
+    applyBenikoDefaultDot();
     grid?.addEventListener('click', () => setTimeout(applyBenikoDetail, 0), true);
     document.addEventListener('keydown', (event) => {
       if (!isCharacterSelectOpen()) return;
@@ -88,6 +110,8 @@
     grid?.addEventListener('dblclick', () => setTimeout(applyHudPortraitIfNeeded, 100), true);
     window.benikoOutfitCacheFix = {
       cache: CACHE,
+      defaultDot: BENIKO_DEFAULT_DOT,
+      applyBenikoDefaultDot,
       applyBenikoDetail,
       cycleBenikoOutfit,
       getCurrentOutfit: () => currentOutfit().id,
