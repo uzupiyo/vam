@@ -1,16 +1,15 @@
 /* Beniko official patch - player asset layout + outfit switching */
 (function () {
-  const VERSION = 'beniko-default-dot-v1';
+  const VERSION = 'beniko-outfit-dot-v3';
   const BENIKO_BASE = 'assets/player/beniko';
   const BENIKO_OUTFIT_BASE = `${BENIKO_BASE}/outfits`;
-  const BENIKO_DEFAULT_DOT = `${BENIKO_BASE}/Beniko Default.png?v=${VERSION}`;
   const BENIKO_OUTFITS = [
     {
       id: 'normal',
       label: 'Normal',
       version: 'Star Mage',
       portrait: `${BENIKO_BASE}/portrait.png?v=${VERSION}`,
-      dot: BENIKO_DEFAULT_DOT,
+      dot: `${BENIKO_BASE}/Beniko Default.png?v=${VERSION}`,
       idle: `${BENIKO_BASE}/idle.gif?v=${VERSION}`,
     },
     {
@@ -18,7 +17,7 @@
       label: 'Origin',
       version: 'Origin ver',
       portrait: `${BENIKO_OUTFIT_BASE}/origin/portrait.png?v=${VERSION}`,
-      dot: BENIKO_DEFAULT_DOT,
+      dot: `${BENIKO_OUTFIT_BASE}/origin/dot.png?v=${VERSION}`,
       idle: `${BENIKO_BASE}/idle.gif?v=${VERSION}`,
     },
   ];
@@ -95,6 +94,7 @@
     document.querySelectorAll('#characterGrid .character-cell').forEach((cell) => {
       if (cell.dataset.character) cell.classList.toggle('selected', cell.dataset.character === id);
     });
+    ensureBenikoCell();
     const portrait = document.getElementById('characterPortrait');
     setImage(portrait, data.portrait, `${data.name} portrait`);
     if (portrait && id === 'beniko') Object.assign(portrait.style, { objectFit: 'contain', width: '100%', height: '100%' });
@@ -117,7 +117,6 @@
     window.selectedBenikoOutfit = currentBenikoOutfit().id;
     benikoIdleFrames = null;
     benikoIdleSrc = null;
-    ensureBenikoCell();
     renderDetail('beniko');
     try { applyRuntime(); updateUI(); } catch(e) {}
   }
@@ -176,7 +175,7 @@
     const grid = document.getElementById('characterGrid');
     grid?.addEventListener('click', (event) => { const cell = event.target.closest('.character-cell'); if (cell?.dataset.character === 'beniko' || cell?.dataset.character === 'rin') { event.preventDefault(); event.stopImmediatePropagation(); selectClean(cell.dataset.character); } }, true);
     grid?.addEventListener('dblclick', (event) => { const cell = event.target.closest('.character-cell'); if (cell?.dataset.character === 'beniko' || cell?.dataset.character === 'rin') { event.preventDefault(); event.stopImmediatePropagation(); selectClean(cell.dataset.character); startGame(); } }, true);
-    document.addEventListener('keydown', (event) => { const characterOverlay = document.getElementById('characterOverlay'); const visible = characterOverlay && !characterOverlay.classList.contains('hidden') && getComputedStyle(characterOverlay).display !== 'none'; if (visible && event.key.toLowerCase() === 'c') { event.preventDefault(); cycleBenikoOutfit(); } }, true);
+    document.addEventListener('keydown', (event) => { const characterOverlay = document.getElementById('characterOverlay'); const visible = characterOverlay && characterOverlay.classList.contains('show'); if (visible && event.key.toLowerCase() === 'c') { event.preventDefault(); event.stopImmediatePropagation(); cycleBenikoOutfit(); } }, true);
     document.getElementById('confirmCharacterButton')?.addEventListener('click', (event) => { event.preventDefault(); event.stopImmediatePropagation(); startGame(); }, true);
   }
   function init() { ensureBenikoCell(); patchRuntime(); bindEvents(); renderDetail(currentId()); window.__benikoOfficialPatch = VERSION; window.cycleBenikoOutfit = cycleBenikoOutfit; }
