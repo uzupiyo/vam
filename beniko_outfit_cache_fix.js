@@ -1,18 +1,19 @@
-/* Beniko outfit cache/path fix - forces Origin portrait and Beniko default dot cache refresh */
+/* Beniko outfit cache/path fix - switches portrait and selection dot together */
 (function () {
-  const CACHE = 'beniko-default-dot-v1';
-  const BENIKO_DEFAULT_DOT = `assets/player/beniko/Beniko Default.png?v=${CACHE}`;
+  const CACHE = 'beniko-outfit-dot-v2';
   const NORMAL = {
     id: 'normal',
     label: 'Normal',
     version: 'Star Mage',
     portrait: `assets/player/beniko/portrait.png?v=${CACHE}`,
+    dot: `assets/player/beniko/Beniko Default.png?v=${CACHE}`,
   };
   const ORIGIN = {
     id: 'origin',
     label: 'Origin',
     version: 'Origin ver',
     portrait: `assets/player/beniko/outfits/origin/portrait.png?v=${CACHE}`,
+    dot: `assets/player/beniko/outfits/origin/dot.png?v=${CACHE}`,
   };
   const outfits = [NORMAL, ORIGIN];
   let outfitIndex = 0;
@@ -31,13 +32,13 @@
     return outfits[outfitIndex] || NORMAL;
   }
 
-  function applyBenikoDefaultDot() {
+  function setBenikoDot(src, label) {
     const img = document.querySelector('#characterGrid .character-cell[data-character="beniko"] img');
     if (!img) return;
-    img.onerror = () => console.error('[BenikoOutfitFix] failed to load Beniko default dot:', BENIKO_DEFAULT_DOT);
+    img.onerror = () => console.error('[BenikoOutfitFix] failed to load Beniko dot:', src);
     img.removeAttribute('srcset');
-    img.src = BENIKO_DEFAULT_DOT;
-    img.alt = 'Beniko default dot';
+    img.src = src;
+    img.alt = `Beniko ${label} dot`;
     img.style.display = 'block';
     img.style.visibility = 'visible';
     img.style.opacity = '1';
@@ -67,9 +68,9 @@
   }
 
   function applyBenikoDetail() {
-    applyBenikoDefaultDot();
-    if (selectedCharacterId() !== 'beniko') return;
     const outfit = currentOutfit();
+    setBenikoDot(outfit.dot, outfit.label);
+    if (selectedCharacterId() !== 'beniko') return;
     setPortrait(outfit.portrait, outfit.label);
     const version = document.getElementById('characterVersion');
     const desc = document.getElementById('characterDesc');
@@ -97,7 +98,7 @@
 
   function bind() {
     const grid = document.getElementById('characterGrid');
-    applyBenikoDefaultDot();
+    setBenikoDot(NORMAL.dot, NORMAL.label);
     grid?.addEventListener('click', () => setTimeout(applyBenikoDetail, 0), true);
     document.addEventListener('keydown', (event) => {
       if (!isCharacterSelectOpen()) return;
@@ -110,8 +111,9 @@
     grid?.addEventListener('dblclick', () => setTimeout(applyHudPortraitIfNeeded, 100), true);
     window.benikoOutfitCacheFix = {
       cache: CACHE,
-      defaultDot: BENIKO_DEFAULT_DOT,
-      applyBenikoDefaultDot,
+      normalDot: NORMAL.dot,
+      originDot: ORIGIN.dot,
+      setBenikoDot,
       applyBenikoDetail,
       cycleBenikoOutfit,
       getCurrentOutfit: () => currentOutfit().id,
