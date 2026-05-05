@@ -1,15 +1,16 @@
 /* Beniko official patch - player asset layout + outfit switching */
 (function () {
-  const VERSION = 'beniko-player-assets-4';
+  const VERSION = 'beniko-default-dot-v1';
   const BENIKO_BASE = 'assets/player/beniko';
   const BENIKO_OUTFIT_BASE = `${BENIKO_BASE}/outfits`;
+  const BENIKO_DEFAULT_DOT = `${BENIKO_BASE}/Beniko Default.png?v=${VERSION}`;
   const BENIKO_OUTFITS = [
     {
       id: 'normal',
       label: 'Normal',
       version: 'Star Mage',
       portrait: `${BENIKO_BASE}/portrait.png?v=${VERSION}`,
-      dot: `${BENIKO_BASE}/dot.png?v=${VERSION}`,
+      dot: BENIKO_DEFAULT_DOT,
       idle: `${BENIKO_BASE}/idle.gif?v=${VERSION}`,
     },
     {
@@ -17,7 +18,7 @@
       label: 'Origin',
       version: 'Origin ver',
       portrait: `${BENIKO_OUTFIT_BASE}/origin/portrait.png?v=${VERSION}`,
-      dot: `${BENIKO_BASE}/dot.png?v=${VERSION}`,
+      dot: BENIKO_DEFAULT_DOT,
       idle: `${BENIKO_BASE}/idle.gif?v=${VERSION}`,
     },
   ];
